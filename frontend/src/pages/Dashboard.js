@@ -65,8 +65,6 @@ const Dashboard = () => {
         return <TransferSOL onSuccess={fetchBalance} />;
       case 'transfer-token':
         return <TransferToken />;
-      case 'bridge':
-        return <BridgeComponent />;
       case 'history':
         return <TransactionHistory />;
       default:
