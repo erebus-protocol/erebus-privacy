@@ -70,12 +70,12 @@ const LandingPage = () => {
             loop 
             muted 
             playsInline
-            className="absolute inset-0 w-full h-full object-cover opacity-30"
-            style={{ filter: 'brightness(0.7)' }}
+            className="absolute inset-0 w-full h-full object-cover"
+            style={{ opacity: '0.4', filter: 'brightness(0.8)' }}
           >
             <source src="https://customer-assets.emergentagent.com/job_erebus-finance/artifacts/40q569i0_Gold-Particles-Wave-2025-10-16-23-56-55-Utc%281%29.mp4" type="video/mp4" />
           </video>
-          <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-black/80"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/90"></div>
         </div>
 
         <div className="relative z-10 max-w-6xl mx-auto px-6 text-center">
