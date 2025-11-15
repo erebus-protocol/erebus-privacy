@@ -40,6 +40,16 @@ const LandingPage = () => {
           <div className="flex items-center gap-6">
             <a href="#features" className="text-sm hover:text-[var(--gold-primary)] transition-colors">Features</a>
             <a href="#about" className="text-sm hover:text-[var(--gold-primary)] transition-colors">About</a>
+            {connected && (
+              <Button
+                onClick={() => navigate('/dashboard')}
+                variant="outline"
+                className="border-[var(--gold-primary)] text-[var(--gold-primary)] hover:bg-[var(--gold-primary)] hover:text-black"
+                data-testid="dashboard-nav-btn"
+              >
+                Dashboard
+              </Button>
+            )}
             <WalletMultiButton data-testid="wallet-connect-btn" />
           </div>
         </div>
