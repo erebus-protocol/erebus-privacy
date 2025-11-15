@@ -255,13 +255,21 @@ async def get_wallet_tokens(wallet: str):
         if response.value:
             for account in response.value:
                 try:
-                    parsed_data = account.account.data.parsed
+                    # Access parsed data correctly
+                    account_data = account.account.data
+                    if hasattr(account_data, 'parsed'):
+                        parsed_data = account_data.parsed
+                    else:
+                        parsed_data = account_data
+                    
                     token_info = parsed_data['info']
                     mint_address = token_info['mint']
                     balance_data = token_info['tokenAmount']
                     
                     # Only include tokens with balance > 0
-                    balance = float(balance_data['uiAmount']) if balance_data['uiAmount'] else 0
+                    ui_amount = balance_data.get('uiAmount')
+                    balance = float(ui_amount) if ui_amount else 0
+                    
                     if balance <= 0:
                         continue
                     
@@ -269,31 +277,33 @@ async def get_wallet_tokens(wallet: str):
                     token_metadata = None
                     for pop_token in popular_tokens:
                         if pop_token['address'] == mint_address:
-                            token_metadata = pop_token
+                            token_metadata = pop_token.copy()
                             break
                     
                     # If not in popular list, get from chain
                     if not token_metadata:
                         try:
                             token_metadata = await get_token_info(mint_address)
-                        except:
+                        except Exception as info_error:
+                            logging.error(f"Error getting token info for {mint_address}: {info_error}")
                             token_metadata = {
                                 "address": mint_address,
                                 "symbol": f"{mint_address[:4].upper()}...{mint_address[-4:].upper()}",
                                 "name": "Unknown Token",
-                                "decimals": balance_data['decimals'],
+                                "decimals": balance_data.get('decimals', 9),
                                 "logoURI": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/So11111111111111111111111111111111111111112/logo.png",
                                 "tags": ["custom"]
                             }
                     
-                    tokens.append({
-                        **token_metadata,
-                        "balance": balance,
-                        "raw_balance": balance_data['amount']
-                    })
+                    # Add balance info
+                    token_metadata['balance'] = balance
+                    token_metadata['raw_balance'] = balance_data.get('amount', '0')
+                    tokens.append(token_metadata)
                     
                 except Exception as e:
                     logging.error(f"Error parsing token account: {e}")
+                    import traceback
+                    logging.error(traceback.format_exc())
                     continue
         
         # Sort by balance (highest first)
@@ -303,6 +313,8 @@ async def get_wallet_tokens(wallet: str):
         
     except Exception as e:
         logging.error(f"Error fetching wallet tokens: {str(e)}")
+        import traceback
+        logging.error(traceback.format_exc())
         raise HTTPException(status_code=500, detail=f"Error fetching wallet tokens: {str(e)}")
 
 @api_router.get("/token-info/{mint}")
