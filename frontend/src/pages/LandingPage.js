@@ -148,30 +148,47 @@ const LandingPage = () => {
         </div>
       </section>
 
-      <section id="features" className="py-24 px-6 bg-[var(--dark-surface)] relative">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl sm:text-5xl font-bold text-center mb-16" style={{ color: 'var(--gold-primary)' }}>
-            Powerful Privacy Features
-          </h2>
+      <section id="features" className="py-24 px-6 bg-[var(--dark-bg)] relative">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl sm:text-5xl font-bold mb-4" style={{ color: 'var(--gold-primary)' }}>
+              Core Features
+            </h2>
+            <p className="text-gray-400 text-lg">Advanced privacy technology for secure transactions</p>
+          </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            <div className="feature-card" data-testid="feature-swap">
-              <div className="feature-icon">
-                <Zap className="h-8 w-8" />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="feature-card-new group" data-testid="feature-deposits">
+              <div className="feature-icon-new mb-6">
+                <Lottie 
+                  animationData={secureLockAnimation} 
+                  loop={true}
+                  className="w-24 h-24 mx-auto"
+                />
               </div>
-              <h3 className="text-2xl font-bold mb-4 text-[var(--gold-primary)]">Private Swap</h3>
-              <p className="text-gray-400">
-                Swap tokens anonymously using Jupiter Aggregator integration.
+              <h3 className="text-2xl font-bold mb-4 text-[var(--gold-primary)]">Private Deposits</h3>
+              <p className="text-gray-400 leading-relaxed">
+                Secure your assets with zero-knowledge proofs. Deposit funds privately and maintain complete transaction confidentiality on Solana.
               </p>
             </div>
 
-            <div className="feature-card" data-testid="feature-transfer">
-              <div className="feature-icon">
-                <Shield className="h-8 w-8" />
+            <div className="feature-card-new group" data-testid="feature-trading">
+              <div className="feature-icon-new mb-6">
+                <Zap className="h-24 w-24 mx-auto text-[var(--gold-primary)]" />
               </div>
-              <h3 className="text-2xl font-bold mb-4 text-[var(--gold-primary)]">Anonymous Transfer</h3>
-              <p className="text-gray-400">
-                Transfer SOL and SPL tokens through our treasury system for complete privacy.
+              <h3 className="text-2xl font-bold mb-4 text-[var(--gold-primary)]">Private Trading</h3>
+              <p className="text-gray-400 leading-relaxed">
+                Trade tokens with complete privacy. Powered by Jupiter aggregator with zero-knowledge privacy layer for confidential transactions.
+              </p>
+            </div>
+
+            <div className="feature-card-new group" data-testid="feature-bridge">
+              <div className="feature-icon-new mb-6">
+                <Lock className="h-24 w-24 mx-auto text-[var(--gold-primary)]" />
+              </div>
+              <h3 className="text-2xl font-bold mb-4 text-[var(--gold-primary)]">Cross-Chain Bridge</h3>
+              <p className="text-gray-400 leading-relaxed">
+                Bridge assets between Ethereum and Solana networks. Secure cross-chain transfers powered by Wormhole with additional privacy features.
               </p>
             </div>
           </div>
