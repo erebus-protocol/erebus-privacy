@@ -222,6 +222,40 @@ const LandingPage = () => {
       </footer>
 
       <style jsx>{`
+        .announcement-bar {
+          animation: slideDown 0.5s ease-out;
+        }
+
+        @keyframes slideDown {
+          from {
+            transform: translateY(-100%);
+            opacity: 0;
+          }
+          to {
+            transform: translateY(0);
+            opacity: 1;
+          }
+        }
+
+        .hero-headline {
+          animation: fadeInUp 1s ease-out;
+        }
+
+        .hero-btn {
+          animation: fadeInUp 1.2s ease-out;
+        }
+
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
         .feature-card {
           background: rgba(26, 26, 26, 0.8);
           border: 1px solid rgba(255, 215, 0, 0.2);
