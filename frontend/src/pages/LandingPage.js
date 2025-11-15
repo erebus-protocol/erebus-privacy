@@ -190,7 +190,11 @@ const LandingPage = () => {
 
             <div className="feature-card-new group" data-testid="feature-bridge">
               <div className="feature-icon-new mb-6">
-                <Lock className="h-24 w-24 mx-auto text-[var(--gold-primary)]" />
+                <Lottie 
+                  animationData={moneyTransferAnimation} 
+                  loop={true}
+                  className="w-24 h-24 mx-auto"
+                />
               </div>
               <h3 className="text-2xl font-bold mb-4 text-[var(--gold-primary)]">Cross-Chain Bridge</h3>
               <p className="text-gray-400 leading-relaxed">
