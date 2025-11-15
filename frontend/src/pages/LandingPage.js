@@ -96,19 +96,40 @@ const LandingPage = () => {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Button 
-              variant="outline" 
-              size="lg"
-              className="hero-btn border-2 text-black bg-gradient-to-r from-[#D4AF37] to-[#FFD700] hover:from-[#FFD700] hover:to-[#D4AF37] transition-all duration-300 px-8 py-6 text-lg font-semibold rounded-full shadow-[0_0_20px_rgba(255,215,0,0.4)]"
-              data-testid="learn-more-btn"
-            >
-              Learn More
-            </Button>
-            
-            {/* Wallet Adapter Button styled as custom button */}
-            <div className="wallet-connect-wrapper">
-              <WalletMultiButton className="hero-wallet-btn" data-testid="hero-wallet-connect-btn" />
-            </div>
+            {!connected ? (
+              <>
+                <Button 
+                  variant="outline" 
+                  size="lg"
+                  className="hero-btn border-2 text-black bg-gradient-to-r from-[#D4AF37] to-[#FFD700] hover:from-[#FFD700] hover:to-[#D4AF37] transition-all duration-300 px-8 py-6 text-lg font-semibold rounded-full shadow-[0_0_20px_rgba(255,215,0,0.4)]"
+                  data-testid="learn-more-btn"
+                >
+                  Learn More
+                </Button>
+                
+                {/* Wallet Adapter Button styled as custom button */}
+                <div className="wallet-connect-wrapper">
+                  <WalletMultiButton className="hero-wallet-btn" data-testid="hero-wallet-connect-btn" />
+                </div>
+              </>
+            ) : (
+              <>
+                <Button 
+                  variant="outline" 
+                  size="lg"
+                  onClick={() => navigate('/dashboard')}
+                  className="hero-btn border-2 text-black bg-gradient-to-r from-[#D4AF37] to-[#FFD700] hover:from-[#FFD700] hover:to-[#D4AF37] transition-all duration-300 px-8 py-6 text-lg font-semibold rounded-full shadow-[0_0_20px_rgba(255,215,0,0.4)]"
+                  data-testid="hero-dashboard-btn"
+                >
+                  Go to Dashboard
+                </Button>
+                
+                {/* Show wallet button when connected for disconnect option */}
+                <div className="wallet-connect-wrapper">
+                  <WalletMultiButton className="hero-wallet-btn" />
+                </div>
+              </>
+            )}
           </div>
         </div>
       </section>
