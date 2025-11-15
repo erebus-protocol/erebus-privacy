@@ -104,13 +104,21 @@ const LandingPage = () => {
             >
               Learn More
             </Button>
+            
+            {/* Hidden WalletMultiButton for functionality */}
+            <div className="hidden">
+              <WalletMultiButton />
+            </div>
+            
             <Button 
               size="lg"
               className="hero-btn text-black bg-gradient-to-r from-[#D4AF37] to-[#FFD700] hover:from-[#FFD700] hover:to-[#D4AF37] transition-all duration-300 px-8 py-6 text-lg font-semibold rounded-full shadow-[0_0_20px_rgba(255,215,0,0.4)]"
               data-testid="hero-wallet-connect-btn"
               onClick={() => {
                 const walletButton = document.querySelector('.wallet-adapter-button');
-                if (walletButton) walletButton.click();
+                if (walletButton) {
+                  walletButton.click();
+                }
               }}
             >
               Connect Wallet
