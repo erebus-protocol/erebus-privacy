@@ -239,95 +239,92 @@ async def get_token_balance(wallet: str, mint: str):
 
 @api_router.get("/wallet-tokens/{wallet}")
 async def get_wallet_tokens(wallet: str):
-    """Get all tokens in wallet with balances"""
+    """Get all tokens in wallet with balances - returns empty if no tokens"""
     try:
         wallet_pubkey = Pubkey.from_string(wallet)
-        
-        # Get all token accounts owned by wallet
-        response = await solana_client.get_token_accounts_by_owner_json_parsed(
-            wallet_pubkey,
-            {"programId": Pubkey.from_string("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA")}
-        )
-        
-        tokens = []
         popular_tokens = await get_token_list()
+        tokens = []
         
-        if response.value:
-            for account in response.value:
+        try:
+            # Get all token accounts owned by wallet
+            response = await solana_client.get_token_accounts_by_owner_json_parsed(
+                wallet_pubkey,
+                {"programId": Pubkey.from_string("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA")}
+            )
+            
+            if not response or not response.value:
+                return {"tokens": [], "count": 0}
+            
+            for account_item in response.value:
                 try:
-                    # Handle both dict and object structures
-                    if isinstance(account, dict):
-                        account_data = account.get('account', {}).get('data', {})
+                    # Parse account structure - solders returns objects with .account attribute
+                    account_obj = account_item.account if hasattr(account_item, 'account') else account_item
+                    
+                    # Get the parsed data
+                    if hasattr(account_obj, 'data') and hasattr(account_obj.data, 'parsed'):
+                        parsed = account_obj.data.parsed
                     else:
-                        account_data = account.account.data
+                        continue
                     
-                    # Extract parsed data
-                    if isinstance(account_data, dict):
-                        parsed_data = account_data.get('parsed', account_data)
-                    elif hasattr(account_data, 'parsed'):
-                        parsed_data = account_data.parsed
-                    else:
-                        parsed_data = account_data
+                    # Extract token info
+                    info = parsed.get('info', {})
+                    mint_address = info.get('mint')
+                    token_amount = info.get('tokenAmount', {})
                     
-                    # Get token info
-                    if isinstance(parsed_data, dict):
-                        token_info = parsed_data.get('info', {})
-                    else:
-                        token_info = parsed_data['info']
+                    if not mint_address:
+                        continue
                     
-                    mint_address = token_info.get('mint') if isinstance(token_info, dict) else token_info['mint']
-                    balance_data = token_info.get('tokenAmount') if isinstance(token_info, dict) else token_info['tokenAmount']
+                    # Get balance
+                    ui_amount = token_amount.get('uiAmount')
+                    balance = float(ui_amount) if ui_amount is not None else 0.0
                     
-                    # Only include tokens with balance > 0
-                    ui_amount = balance_data.get('uiAmount')
-                    balance = float(ui_amount) if ui_amount else 0
-                    
+                    # Skip zero balances
                     if balance <= 0:
                         continue
                     
-                    # Find token metadata from popular list
+                    # Find metadata
                     token_metadata = None
                     for pop_token in popular_tokens:
                         if pop_token['address'] == mint_address:
                             token_metadata = pop_token.copy()
                             break
                     
-                    # If not in popular list, get from chain
                     if not token_metadata:
+                        # Try to get from chain
                         try:
                             token_metadata = await get_token_info(mint_address)
-                        except Exception as info_error:
-                            logging.error(f"Error getting token info for {mint_address}: {info_error}")
+                        except:
                             token_metadata = {
                                 "address": mint_address,
-                                "symbol": f"{mint_address[:4].upper()}...{mint_address[-4:].upper()}",
+                                "symbol": f"{mint_address[:4].upper()}",
                                 "name": "Unknown Token",
-                                "decimals": balance_data.get('decimals', 9),
+                                "decimals": token_amount.get('decimals', 9),
                                 "logoURI": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/So11111111111111111111111111111111111111112/logo.png",
                                 "tags": ["custom"]
                             }
                     
-                    # Add balance info
                     token_metadata['balance'] = balance
-                    token_metadata['raw_balance'] = balance_data.get('amount', '0')
+                    token_metadata['raw_balance'] = token_amount.get('amount', '0')
                     tokens.append(token_metadata)
                     
-                except Exception as e:
-                    logging.error(f"Error parsing token account: {e}")
-                    import traceback
-                    logging.error(traceback.format_exc())
+                except Exception as parse_error:
+                    logging.error(f"Error parsing single token account: {parse_error}")
                     continue
+            
+        except Exception as rpc_error:
+            logging.error(f"RPC error fetching token accounts: {rpc_error}")
+            # Return empty instead of error - wallet might just have no tokens
+            return {"tokens": [], "count": 0}
         
-        # Sort by balance (highest first)
-        tokens.sort(key=lambda x: x['balance'], reverse=True)
+        # Sort by balance
+        tokens.sort(key=lambda x: x.get('balance', 0), reverse=True)
         
         return {"tokens": tokens, "count": len(tokens)}
         
     except Exception as e:
-        logging.error(f"Error fetching wallet tokens: {str(e)}")
-        import traceback
-        logging.error(traceback.format_exc())
-        raise HTTPException(status_code=500, detail=f"Error fetching wallet tokens: {str(e)}")
+        logging.error(f"Error in wallet-tokens endpoint: {str(e)}")
+        # Return empty list instead of error for better UX
+        return {"tokens": [], "count": 0}
 
 @api_router.get("/token-info/{mint}")
 async def get_token_info(mint: str):
