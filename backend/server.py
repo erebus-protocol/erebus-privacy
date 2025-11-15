@@ -189,32 +189,37 @@ async def get_token_balance(wallet: str, mint: str):
 async def get_token_info(mint: str):
     """Get token metadata by mint address"""
     try:
-        # Try to fetch from Solana metadata
-        async with httpx.AsyncClient() as client:
-            # Try multiple sources for token info
+        mint_pubkey = Pubkey.from_string(mint)
+        
+        # Get account info to verify token exists
+        account_info = await solana_client.get_account_info(mint_pubkey)
+        
+        if account_info.value:
+            # Parse mint data to get decimals
+            data = account_info.value.data
+            decimals = 9  # Default
             
-            # 1. Try Jupiter token list first
-            response = await client.get(f"https://tokens.jup.ag/token/{mint}")
-            if response.status_code == 200:
-                return response.json()
+            # SPL Token Mint layout: first byte after 36 bytes is decimals
+            if len(data) >= 44:
+                try:
+                    decimals = data[44]
+                except:
+                    decimals = 9
             
-            # 2. Fallback to on-chain metadata
-            mint_pubkey = Pubkey.from_string(mint)
-            account_info = await solana_client.get_account_info(mint_pubkey)
-            
-            if account_info.value:
-                # Basic token info from on-chain data
-                return {
-                    "address": mint,
-                    "symbol": mint[:4].upper(),
-                    "name": f"Token {mint[:8]}",
-                    "decimals": 9,  # Default, should parse from account data
-                    "logoURI": "https://via.placeholder.com/32",
-                    "tags": []
-                }
-            else:
-                raise HTTPException(status_code=404, detail="Token not found")
+            # Return basic token info
+            return {
+                "address": mint,
+                "symbol": mint[:4].upper(),
+                "name": f"Token {mint[:8]}...",
+                "decimals": decimals,
+                "logoURI": "https://via.placeholder.com/32",
+                "tags": ["custom"]
+            }
+        else:
+            raise HTTPException(status_code=404, detail="Token not found on chain")
                 
+    except HTTPException:
+        raise
     except Exception as e:
         logging.error(f"Token info error: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Error fetching token info: {str(e)}")
