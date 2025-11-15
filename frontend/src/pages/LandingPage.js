@@ -16,12 +16,6 @@ const LandingPage = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  useEffect(() => {
-    if (connected) {
-      setTimeout(() => navigate('/dashboard'), 500);
-    }
-  }, [connected, navigate]);
-
   return (
     <div className="landing-page">
       <nav className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
