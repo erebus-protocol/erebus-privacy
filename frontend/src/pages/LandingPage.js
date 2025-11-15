@@ -389,34 +389,6 @@ const LandingPage = () => {
         </div>
       </footer>
 
-      <footer className="py-12 px-6 border-t border-[var(--dark-border)]">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-            <div className="flex items-center gap-3">
-              <img 
-                src="https://customer-assets.emergentagent.com/job_ed48b7a2-6a38-4200-8e89-4581c421d9ea/artifacts/q9tyi3wm_erebus-icon.svg" 
-                alt="Erebus" 
-                className="h-8 w-8"
-              />
-              <span className="text-lg font-semibold" style={{ color: 'var(--gold-primary)' }}>Erebus Protocol</span>
-            </div>
-            
-            <div className="flex gap-6">
-              <a href="#" className="text-gray-400 hover:text-[var(--gold-primary)] transition-colors">
-                <Twitter className="h-5 w-5" />
-              </a>
-              <a href="#" className="text-gray-400 hover:text-[var(--gold-primary)] transition-colors">
-                <Github className="h-5 w-5" />
-              </a>
-            </div>
-            
-            <div className="text-sm text-gray-500">
-              © 2025 Erebus Protocol
-            </div>
-          </div>
-        </div>
-      </footer>
-
       <style jsx>{`
         .announcement-bar {
           animation: slideDown 0.5s ease-out;
