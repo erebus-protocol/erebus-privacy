@@ -154,26 +154,70 @@ async def get_swap_quote(request: SwapQuoteRequest):
 async def get_token_balance(wallet: str, mint: str):
     """Get SPL token balance for a wallet"""
     try:
+        from solders.rpc.responses import GetTokenAccountsByOwnerJsonParsedResp
+        from solana.rpc.core import RPCException
+        
         wallet_pubkey = Pubkey.from_string(wallet)
         mint_pubkey = Pubkey.from_string(mint)
         
-        # Get token accounts by owner
-        response = await solana_client.get_token_accounts_by_owner(
+        # Get token accounts by owner with parsed data
+        opts = {"encoding": "jsonParsed"}
+        response = await solana_client.get_token_accounts_by_owner_json_parsed(
             wallet_pubkey,
             {"mint": mint_pubkey}
         )
         
-        if response.value:
-            # Parse token account data
-            token_account = response.value[0]
-            balance = 0
-            # TODO: Parse token account data properly
-            return {"balance": balance, "mint": mint}
+        if response.value and len(response.value) > 0:
+            # Get the first token account (usually there's only one per mint)
+            token_account_info = response.value[0].account.data.parsed
+            balance_data = token_account_info['info']['tokenAmount']
+            
+            return {
+                "balance": float(balance_data['uiAmount']),
+                "decimals": balance_data['decimals'],
+                "mint": mint,
+                "raw_balance": balance_data['amount']
+            }
         else:
-            return {"balance": 0, "mint": mint}
+            return {"balance": 0, "decimals": 0, "mint": mint, "raw_balance": "0"}
+            
     except Exception as e:
         logging.error(f"Token balance error: {str(e)}")
-        return {"balance": 0, "mint": mint}
+        return {"balance": 0, "decimals": 0, "mint": mint, "raw_balance": "0"}
+
+@api_router.get("/token-info/{mint}")
+async def get_token_info(mint: str):
+    """Get token metadata by mint address"""
+    try:
+        # Try to fetch from Solana metadata
+        async with httpx.AsyncClient() as client:
+            # Try multiple sources for token info
+            
+            # 1. Try Jupiter token list first
+            response = await client.get(f"https://tokens.jup.ag/token/{mint}")
+            if response.status_code == 200:
+                return response.json()
+            
+            # 2. Fallback to on-chain metadata
+            mint_pubkey = Pubkey.from_string(mint)
+            account_info = await solana_client.get_account_info(mint_pubkey)
+            
+            if account_info.value:
+                # Basic token info from on-chain data
+                return {
+                    "address": mint,
+                    "symbol": mint[:4].upper(),
+                    "name": f"Token {mint[:8]}",
+                    "decimals": 9,  # Default, should parse from account data
+                    "logoURI": "https://via.placeholder.com/32",
+                    "tags": []
+                }
+            else:
+                raise HTTPException(status_code=404, detail="Token not found")
+                
+    except Exception as e:
+        logging.error(f"Token info error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error fetching token info: {str(e)}")
 
 @api_router.post("/transfer/sol")
 async def transfer_sol_private(request: TransferSOLRequest):
