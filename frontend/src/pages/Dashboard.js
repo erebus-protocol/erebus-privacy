@@ -6,15 +6,11 @@ import { useNavigate } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { ArrowLeft, Wallet, Activity } from 'lucide-react';
-import axios from 'axios';
 import SwapComponent from '../components/SwapComponent';
 import TransferSOL from '../components/TransferSOL';
 import TransferToken from '../components/TransferToken';
 import BridgeComponent from '../components/BridgeComponent';
 import TransactionHistory from '../components/TransactionHistory';
-
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
 
 const Dashboard = () => {
   const { publicKey, connected } = useWallet();
@@ -33,7 +29,7 @@ const Dashboard = () => {
   useEffect(() => {
     if (publicKey && connected) {
       fetchBalance();
-      const interval = setInterval(fetchBalance, 10000); // Update every 10s
+      const interval = setInterval(fetchBalance, 10000);
       return () => clearInterval(interval);
     }
   }, [publicKey, connected]);
@@ -56,7 +52,6 @@ const Dashboard = () => {
 
   return (
     <div className="dashboard" data-testid="dashboard-container">
-      {/* Header */}
       <div className="dashboard-header">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
@@ -84,9 +79,7 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Main Content */}
       <div className="max-w-7xl mx-auto px-6 py-8">
-        {/* Balance Card */}
         <Card className="mb-8 bg-[var(--dark-surface)] border-[var(--gold-accent)]" data-testid="balance-card">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-[var(--gold-primary)]">
@@ -104,7 +97,6 @@ const Dashboard = () => {
           </CardContent>
         </Card>
 
-        {/* Main Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-5 bg-[var(--dark-surface)] border border-[var(--dark-border)] mb-6">
             <TabsTrigger 

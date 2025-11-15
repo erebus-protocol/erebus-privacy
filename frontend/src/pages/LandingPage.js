@@ -24,7 +24,6 @@ const LandingPage = () => {
 
   return (
     <div className="landing-page">
-      {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
         style={{
           background: scrollY > 50 ? 'rgba(10, 10, 10, 0.95)' : 'transparent',
@@ -52,9 +51,7 @@ const LandingPage = () => {
         </div>
       </nav>
 
-      {/* Hero Section */}
       <section className="hero-section relative min-h-screen flex items-center justify-center overflow-hidden">
-        {/* Animated Background */}
         <div className="absolute inset-0 z-0">
           <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[var(--gold-primary)] opacity-10 blur-[120px] rounded-full animate-float"></div>
           <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-[var(--gold-secondary)] opacity-10 blur-[120px] rounded-full animate-float" style={{ animationDelay: '1s' }}></div>
@@ -78,8 +75,7 @@ const LandingPage = () => {
           </p>
           
           <p className="text-base sm:text-lg mb-12 text-gray-400 max-w-2xl mx-auto">
-            Execute private swaps, transfers, and bridges with military-grade encryption.
-            Your transactions, your privacy.
+            Execute private swaps, transfers, and bridges with military-grade encryption. Your transactions, your privacy.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
@@ -94,7 +90,6 @@ const LandingPage = () => {
             </Button>
           </div>
 
-          {/* Stats */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 mt-20 max-w-4xl mx-auto">
             <div className="stat-card">
               <div className="text-4xl font-bold text-[var(--gold-primary)] mb-2">100%</div>
@@ -112,7 +107,6 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Features Section */}
       <section id="features" className="py-24 px-6 bg-[var(--dark-surface)] relative">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-4xl sm:text-5xl font-bold text-center mb-16" style={{ color: 'var(--gold-primary)' }}>
@@ -126,7 +120,7 @@ const LandingPage = () => {
               </div>
               <h3 className="text-2xl font-bold mb-4 text-[var(--gold-primary)]">Private Swap</h3>
               <p className="text-gray-400">
-                Swap tokens anonymously using Jupiter Aggregator integration with ZK-privacy layer.
+                Swap tokens anonymously using Jupiter Aggregator integration.
               </p>
             </div>
 
@@ -153,7 +147,6 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* How It Works */}
       <section id="about" className="py-24 px-6">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-4xl sm:text-5xl font-bold text-center mb-16" style={{ color: 'var(--gold-primary)' }}>
@@ -165,7 +158,7 @@ const LandingPage = () => {
               <div className="step-number">1</div>
               <div>
                 <h3 className="text-2xl font-bold mb-2 text-[var(--gold-primary)]">Connect Wallet</h3>
-                <p className="text-gray-400">Connect your Solana wallet using any supported adapter (Phantom, Solflare, etc.)</p>
+                <p className="text-gray-400">Connect your Solana wallet using any supported adapter.</p>
               </div>
             </div>
 
@@ -173,7 +166,7 @@ const LandingPage = () => {
               <div className="step-number">2</div>
               <div>
                 <h3 className="text-2xl font-bold mb-2 text-[var(--gold-primary)]">Choose Operation</h3>
-                <p className="text-gray-400">Select your desired operation: Swap, Transfer SOL, Transfer Token, or Bridge</p>
+                <p className="text-gray-400">Select swap, transfer, or bridge operation.</p>
               </div>
             </div>
 
@@ -181,14 +174,13 @@ const LandingPage = () => {
               <div className="step-number">3</div>
               <div>
                 <h3 className="text-2xl font-bold mb-2 text-[var(--gold-primary)]">Private Execution</h3>
-                <p className="text-gray-400">Your transaction is routed through our treasury system, ensuring complete privacy</p>
+                <p className="text-gray-400">Your transaction is routed through our treasury system.</p>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Footer */}
       <footer className="py-12 px-6 border-t border-[var(--dark-border)]">
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
@@ -211,7 +203,7 @@ const LandingPage = () => {
             </div>
             
             <div className="text-sm text-gray-500">
-              © 2025 Erebus Protocol. All rights reserved.
+              © 2025 Erebus Protocol
             </div>
           </div>
         </div>
@@ -224,7 +216,6 @@ const LandingPage = () => {
           border-radius: 16px;
           padding: 2rem;
           transition: all 0.3s ease;
-          backdrop-filter: blur(10px);
         }
 
         .feature-card:hover {
@@ -253,12 +244,6 @@ const LandingPage = () => {
           background: rgba(26, 26, 26, 0.5);
           border-radius: 16px;
           border: 1px solid rgba(255, 215, 0, 0.1);
-          transition: all 0.3s ease;
-        }
-
-        .how-it-works-step:hover {
-          border-color: var(--gold-accent);
-          background: rgba(26, 26, 26, 0.8);
         }
 
         .step-number {
@@ -280,12 +265,6 @@ const LandingPage = () => {
           background: rgba(26, 26, 26, 0.5);
           border-radius: 12px;
           border: 1px solid rgba(255, 215, 0, 0.1);
-          transition: all 0.3s ease;
-        }
-
-        .stat-card:hover {
-          border-color: var(--gold-primary);
-          transform: translateY(-4px);
         }
       `}</style>
     </div>
