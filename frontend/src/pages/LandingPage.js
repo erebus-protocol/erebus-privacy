@@ -430,61 +430,72 @@ template ErebusTransfer() {
           background: linear-gradient(to right, #D4AF37, #FFD700) !important;
         }
 
-        .feature-card {
-          background: rgba(26, 26, 26, 0.8);
-          border: 1px solid rgba(255, 215, 0, 0.2);
-          border-radius: 16px;
-          padding: 2rem;
+        .stat-card-new {
           transition: all 0.3s ease;
         }
 
-        .feature-card:hover {
+        .stat-card-new:hover {
+          transform: translateY(-4px);
+          border-color: var(--gold-primary);
+          box-shadow: 0 8px 24px rgba(255, 215, 0, 0.3);
+        }
+
+        .feature-card-new {
+          padding: 2rem;
+          background: rgba(26, 26, 26, 0.5);
+          border: 1px solid rgba(255, 215, 0, 0.1);
+          border-radius: 16px;
+          transition: all 0.3s ease;
+          text-align: center;
+        }
+
+        .feature-card-new:hover {
           transform: translateY(-8px);
           border-color: var(--gold-primary);
           box-shadow: 0 12px 32px rgba(255, 215, 0, 0.2);
+          background: rgba(26, 26, 26, 0.8);
         }
 
-        .feature-icon {
-          width: 64px;
-          height: 64px;
-          background: linear-gradient(135deg, var(--gold-primary), var(--gold-secondary));
-          border-radius: 12px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: #000;
-          margin-bottom: 1.5rem;
+        .feature-icon-new {
+          transition: all 0.3s ease;
         }
 
-        .how-it-works-step {
-          display: flex;
-          gap: 2rem;
-          align-items: flex-start;
+        .feature-card-new:hover .feature-icon-new {
+          transform: scale(1.1);
+        }
+
+        .tech-item {
+          transition: all 0.3s ease;
+        }
+
+        .tech-item:hover {
+          border-color: var(--gold-primary);
+          background: rgba(0, 0, 0, 0.5);
+          transform: translateX(8px);
+        }
+
+        .code-block {
+          transition: all 0.3s ease;
+        }
+
+        .code-block:hover {
+          border-color: var(--gold-primary);
+          box-shadow: 0 4px 16px rgba(255, 215, 0, 0.1);
+        }
+
+        .ritual-card {
           padding: 2rem;
-          background: rgba(26, 26, 26, 0.5);
+          background: rgba(0, 0, 0, 0.3);
+          border: 1px solid rgba(255, 215, 0, 0.1);
           border-radius: 16px;
-          border: 1px solid rgba(255, 215, 0, 0.1);
+          transition: all 0.3s ease;
         }
 
-        .step-number {
-          width: 48px;
-          height: 48px;
-          background: linear-gradient(135deg, var(--gold-primary), var(--gold-secondary));
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 1.5rem;
-          font-weight: bold;
-          color: #000;
-          flex-shrink: 0;
-        }
-
-        .stat-card {
-          padding: 1.5rem;
-          background: rgba(26, 26, 26, 0.5);
-          border-radius: 12px;
-          border: 1px solid rgba(255, 215, 0, 0.1);
+        .ritual-card:hover {
+          border-color: var(--gold-primary);
+          background: rgba(0, 0, 0, 0.5);
+          transform: translateY(-8px);
+          box-shadow: 0 12px 32px rgba(255, 215, 0, 0.2);
         }
       `}</style>
     </div>
