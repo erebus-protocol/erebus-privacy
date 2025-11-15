@@ -54,6 +54,24 @@ const webpackConfig = {
         zlib: false,
       };
 
+      // Disable source-map-loader for node_modules to avoid ENOENT errors
+      webpackConfig.module.rules = webpackConfig.module.rules.map(rule => {
+        if (rule.enforce === 'pre' && rule.loader && rule.loader.includes('source-map-loader')) {
+          return {
+            ...rule,
+            exclude: /node_modules/
+          };
+        }
+        return rule;
+      });
+
+      // Ignore missing source maps
+      webpackConfig.ignoreWarnings = [
+        ...(webpackConfig.ignoreWarnings || []),
+        /Failed to parse source map/,
+        /source-map-loader/
+      ];
+
       // Provide global Buffer and process
       const webpack = require('webpack');
       webpackConfig.plugins = webpackConfig.plugins || [];
@@ -63,7 +81,7 @@ const webpackConfig = {
           process: 'process',
         }),
         new webpack.DefinePlugin({
-          'process.env': JSON.stringify(process.env),
+          'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'),
         })
       );
 
