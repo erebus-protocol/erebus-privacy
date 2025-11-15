@@ -9,6 +9,7 @@ import '@/App.css';
 
 import LandingPage from './pages/LandingPage';
 import Dashboard from './pages/Dashboard';
+import DocsPage from './pages/DocsPage';
 import { Toaster } from './components/ui/sonner';
 
 const RPC_URL = 'https://rpc.ankr.com/solana/99ff114abbcb6a8388649bcbf14069aff2c679e5326d6a9e0a34871de3b00023';
