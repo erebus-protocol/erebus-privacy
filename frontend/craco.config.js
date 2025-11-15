@@ -62,15 +62,13 @@ const webpackConfig = {
         'process/browser.js': require.resolve('process'),
       };
 
-      // Disable source-map-loader for node_modules to avoid ENOENT errors
-      webpackConfig.module.rules = webpackConfig.module.rules.map(rule => {
+      // Completely disable source-map-loader to avoid ENOENT errors
+      webpackConfig.module.rules = webpackConfig.module.rules.filter(rule => {
+        // Remove source-map-loader completely
         if (rule.enforce === 'pre' && rule.loader && rule.loader.includes('source-map-loader')) {
-          return {
-            ...rule,
-            exclude: /node_modules/
-          };
+          return false;
         }
-        return rule;
+        return true;
       });
 
       // Add rule to handle .mjs files
