@@ -140,7 +140,7 @@ const LandingPage = () => {
             Powerful Privacy Features
           </h2>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             <div className="feature-card" data-testid="feature-swap">
               <div className="feature-icon">
                 <Zap className="h-8 w-8" />
@@ -158,16 +158,6 @@ const LandingPage = () => {
               <h3 className="text-2xl font-bold mb-4 text-[var(--gold-primary)]">Anonymous Transfer</h3>
               <p className="text-gray-400">
                 Transfer SOL and SPL tokens through our treasury system for complete privacy.
-              </p>
-            </div>
-
-            <div className="feature-card" data-testid="feature-bridge">
-              <div className="feature-icon">
-                <Lock className="h-8 w-8" />
-              </div>
-              <h3 className="text-2xl font-bold mb-4 text-[var(--gold-primary)]">Cross-Chain Bridge</h3>
-              <p className="text-gray-400">
-                Bridge assets across chains privately using Wormhole integration.
               </p>
             </div>
           </div>
