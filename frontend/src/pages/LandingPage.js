@@ -88,10 +88,10 @@ const LandingPage = () => {
             THE UNDERWORLD<br />OF PRIVACY
           </h1>
           
-          <p className="text-base sm:text-lg lg:text-xl mb-12 text-[var(--gold-primary)] max-w-3xl mx-auto italic font-light leading-relaxed" style={{
+          <p className="text-base sm:text-lg lg:text-xl mb-12 text-[var(--gold-primary)] max-w-4xl mx-auto italic font-light leading-relaxed" style={{
             textShadow: '0 0 20px rgba(255, 215, 0, 0.3)'
           }}>
-            Secure and private transactions using zero-knowledge cryptography.
+            Secure and private transactions using zero-knowledge cryptography.<br />
             Protect your financial data with advanced privacy technology.
           </p>
 
