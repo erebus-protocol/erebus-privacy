@@ -4,12 +4,10 @@ import {
   ArrowLeftRight, 
   Send, 
   Coins, 
-  Network, 
   Clock, 
   Home,
   Menu,
-  X,
-  ExternalLink
+  X
 } from 'lucide-react';
 
 const Sidebar = ({ balance, loading, walletAddress }) => {
