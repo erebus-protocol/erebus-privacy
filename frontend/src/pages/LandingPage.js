@@ -133,37 +133,6 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Stats Section */}
-      <section className="py-20 px-6 bg-[var(--dark-bg)] relative border-t border-b border-[var(--gold-primary)]/10">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
-            <div className="stat-card-highlight group">
-              <div className="stat-icon mb-4">
-                <Shield className="h-16 w-16 mx-auto text-[var(--gold-primary)]" />
-              </div>
-              <div className="text-4xl sm:text-5xl font-bold text-[var(--gold-primary)] mb-3">SECURE</div>
-              <div className="text-gray-300 text-lg">Privacy</div>
-            </div>
-            
-            <div className="stat-card-highlight group">
-              <div className="stat-icon mb-4">
-                <Zap className="h-16 w-16 mx-auto text-[var(--gold-primary)]" />
-              </div>
-              <div className="text-4xl sm:text-5xl font-bold text-[var(--gold-primary)] mb-3">FAST</div>
-              <div className="text-gray-300 text-lg">Transactions</div>
-            </div>
-            
-            <div className="stat-card-highlight group">
-              <div className="stat-icon mb-4">
-                <Lock className="h-16 w-16 mx-auto text-[var(--gold-primary)]" />
-              </div>
-              <div className="text-4xl sm:text-5xl font-bold text-[var(--gold-primary)] mb-3">PROVEN</div>
-              <div className="text-gray-300 text-lg">Technology</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       <section id="features" className="py-24 px-6 bg-[var(--dark-bg)] relative">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
