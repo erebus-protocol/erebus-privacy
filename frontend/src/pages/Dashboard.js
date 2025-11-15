@@ -3,8 +3,6 @@ import { useWallet, useConnection } from '@solana/wallet-adapter-react';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
-import { Wallet } from 'lucide-react';
 import Sidebar from '../components/Sidebar';
 import SwapComponent from '../components/SwapComponent';
 import TransferSOL from '../components/TransferSOL';
