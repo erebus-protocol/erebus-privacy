@@ -18,7 +18,15 @@ const LandingPage = () => {
 
   return (
     <div className="landing-page">
-      <nav className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
+      {/* Announcement Bar */}
+      <div className="announcement-bar fixed top-0 left-0 right-0 z-[60] bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-black py-3 px-6 text-center text-sm font-medium">
+        <div className="flex items-center justify-center gap-2">
+          <Sparkles className="h-4 w-4" />
+          <span>Erebus Protocol Beta Version is Now Live! Experience the power of zero-knowledge privacy on Solana.</span>
+        </div>
+      </div>
+
+      <nav className="fixed top-12 left-0 right-0 z-50 transition-all duration-300"
         style={{
           background: scrollY > 50 ? 'rgba(10, 10, 10, 0.95)' : 'transparent',
           backdropFilter: scrollY > 50 ? 'blur(12px)' : 'none',
@@ -38,8 +46,9 @@ const LandingPage = () => {
             />
           </div>
           <div className="flex items-center gap-6">
-            <a href="#features" className="text-sm hover:text-[var(--gold-primary)] transition-colors">Features</a>
-            <a href="#about" className="text-sm hover:text-[var(--gold-primary)] transition-colors">About</a>
+            <a href="#home" className="text-sm hover:text-[var(--gold-primary)] transition-colors">HOME</a>
+            <a href="#features" className="text-sm hover:text-[var(--gold-primary)] transition-colors">FEATURES</a>
+            <a href="#docs" className="text-sm hover:text-[var(--gold-primary)] transition-colors">DOCS</a>
             {connected && (
               <Button
                 onClick={() => navigate('/dashboard')}
