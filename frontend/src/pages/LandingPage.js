@@ -7,6 +7,7 @@ import { Button } from '../components/ui/button';
 import Lottie from 'lottie-react';
 import secureLockAnimation from '../assets/secure-lock.json';
 import bitcoinExchangeAnimation from '../assets/bitcoin-exchange.json';
+import moneyTransferAnimation from '../assets/money-transfer.json';
 
 const LandingPage = () => {
   const navigate = useNavigate();
