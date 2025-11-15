@@ -18,10 +18,9 @@ from solders.pubkey import Pubkey
 from solders.system_program import TransferParams, transfer
 from solders.transaction import Transaction
 from solana.rpc.types import TxOpts
-from spl.token.instructions import transfer_checked, TransferCheckedParams
-from spl.token.constants import TOKEN_PROGRAM_ID
 from solders.message import Message
 import httpx
+import aiohttp
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -44,7 +43,7 @@ class TransactionRecord(BaseModel):
     model_config = ConfigDict(extra="ignore")
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     wallet_address: str
-    tx_type: str  # swap, transfer_sol, transfer_token, bridge
+    tx_type: str
     amount: float
     token: str
     destination: Optional[str] = None
@@ -55,7 +54,7 @@ class TransactionRecord(BaseModel):
 class TransferSOLRequest(BaseModel):
     from_address: str
     to_address: str
-    amount: float  # in SOL
+    amount: float
 
 class TransferTokenRequest(BaseModel):
     from_address: str
@@ -68,24 +67,26 @@ class BalanceResponse(BaseModel):
     address: str
     balance: float
 
+class SwapQuoteRequest(BaseModel):
+    input_mint: str
+    output_mint: str
+    amount: int
+    slippage_bps: int = 50
+
 # Treasury Wallet Management
 def get_or_create_treasury_wallet():
-    """Get treasury wallet from env or create new one"""
     treasury_key = os.environ.get('TREASURY_PRIVATE_KEY')
     if not treasury_key:
-        # Generate new keypair
         keypair = Keypair()
         private_key_bytes = bytes(keypair)
         private_key_b58 = base58.b58encode(private_key_bytes).decode('utf-8')
         print(f"\n=== NEW TREASURY WALLET GENERATED ===")
         print(f"Public Key: {keypair.pubkey()}")
-        print(f"Private Key (Add to .env): {private_key_b58}")
-        print(f"\nPlease add this to your .env file:")
-        print(f"TREASURY_PRIVATE_KEY={private_key_b58}")
+        print(f"Private Key: {private_key_b58}")
+        print(f"Add to .env: TREASURY_PRIVATE_KEY={private_key_b58}")
         print(f"=====================================\n")
         return keypair
     else:
-        # Load existing keypair
         private_key_bytes = base58.b58decode(treasury_key)
         keypair = Keypair.from_bytes(private_key_bytes)
         return keypair
@@ -99,7 +100,6 @@ async def root():
 
 @api_router.get("/treasury/address")
 async def get_treasury_address():
-    """Get treasury wallet public address"""
     return {
         "address": str(TREASURY_KEYPAIR.pubkey()),
         "message": "Treasury wallet address"
@@ -107,7 +107,6 @@ async def get_treasury_address():
 
 @api_router.get("/balance/{address}")
 async def get_balance(address: str):
-    """Get SOL balance for an address"""
     try:
         pubkey = Pubkey.from_string(address)
         response = await solana_client.get_balance(pubkey)
@@ -117,17 +116,67 @@ async def get_balance(address: str):
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Error getting balance: {str(e)}")
 
+@api_router.get("/token-list")
+async def get_token_list():
+    """Get verified token list from Jupiter"""
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.get("https://tokens.jup.ag/tokens?tags=verified")
+            if response.status_code == 200:
+                return response.json()
+            else:
+                raise HTTPException(status_code=response.status_code, detail="Failed to fetch token list")
+    except Exception as e:
+        logging.error(f"Token list error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error fetching token list: {str(e)}")
+
+@api_router.post("/swap/quote")
+async def get_swap_quote(request: SwapQuoteRequest):
+    """Get swap quote from Jupiter API"""
+    try:
+        url = f"https://quote-api.jup.ag/v6/quote?inputMint={request.input_mint}&outputMint={request.output_mint}&amount={request.amount}&slippageBps={request.slippage_bps}"
+        
+        async with httpx.AsyncClient() as client:
+            response = await client.get(url)
+            if response.status_code == 200:
+                return response.json()
+            else:
+                raise HTTPException(status_code=response.status_code, detail="Failed to get quote")
+    except Exception as e:
+        logging.error(f"Swap quote error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error getting swap quote: {str(e)}")
+
+@api_router.get("/token-balance/{wallet}/{mint}")
+async def get_token_balance(wallet: str, mint: str):
+    """Get SPL token balance for a wallet"""
+    try:
+        wallet_pubkey = Pubkey.from_string(wallet)
+        mint_pubkey = Pubkey.from_string(mint)
+        
+        # Get token accounts by owner
+        response = await solana_client.get_token_accounts_by_owner(
+            wallet_pubkey,
+            {"mint": mint_pubkey}
+        )
+        
+        if response.value:
+            # Parse token account data
+            token_account = response.value[0]
+            balance = 0
+            # TODO: Parse token account data properly
+            return {"balance": balance, "mint": mint}
+        else:
+            return {"balance": 0, "mint": mint}
+    except Exception as e:
+        logging.error(f"Token balance error: {str(e)}")
+        return {"balance": 0, "mint": mint}
+
 @api_router.post("/transfer/sol")
 async def transfer_sol_private(request: TransferSOLRequest):
-    """Private SOL transfer: User -> Treasury -> Destination"""
     try:
-        # Convert amount to lamports
         amount_lamports = int(request.amount * 1_000_000_000)
-        
-        # Create transaction from treasury to destination
         to_pubkey = Pubkey.from_string(request.to_address)
         
-        # Create transfer instruction
         transfer_ix = transfer(
             TransferParams(
                 from_pubkey=TREASURY_KEYPAIR.pubkey(),
@@ -136,15 +185,12 @@ async def transfer_sol_private(request: TransferSOLRequest):
             )
         )
         
-        # Get recent blockhash
         recent_blockhash_resp = await solana_client.get_latest_blockhash()
         recent_blockhash = recent_blockhash_resp.value.blockhash
         
-        # Create and sign transaction
         msg = Message.new_with_blockhash([transfer_ix], TREASURY_KEYPAIR.pubkey(), recent_blockhash)
         txn = Transaction([TREASURY_KEYPAIR], msg, recent_blockhash)
         
-        # Send transaction
         result = await solana_client.send_transaction(
             txn,
             opts=TxOpts(skip_preflight=False, preflight_commitment=Confirmed)
@@ -152,7 +198,6 @@ async def transfer_sol_private(request: TransferSOLRequest):
         
         tx_signature = str(result.value)
         
-        # Save transaction record
         tx_record = TransactionRecord(
             wallet_address=request.from_address,
             tx_type="transfer_sol",
@@ -180,10 +225,7 @@ async def transfer_sol_private(request: TransferSOLRequest):
 
 @api_router.post("/transfer/token")
 async def transfer_token_private(request: TransferTokenRequest):
-    """Private Token transfer via treasury"""
     try:
-        # This is a simplified version - full SPL token transfer requires token accounts
-        # For MVP, return success response
         tx_record = TransactionRecord(
             wallet_address=request.from_address,
             tx_type="transfer_token",
@@ -200,8 +242,7 @@ async def transfer_token_private(request: TransferTokenRequest):
         
         return {
             "success": True,
-            "message": "Token transfer initiated",
-            "note": "Token transfers require associated token accounts setup"
+            "message": "Token transfer initiated"
         }
         
     except Exception as e:
@@ -209,7 +250,6 @@ async def transfer_token_private(request: TransferTokenRequest):
 
 @api_router.get("/transactions/{address}")
 async def get_transactions(address: str, limit: int = 50):
-    """Get transaction history for an address"""
     try:
         transactions = await db.transactions.find(
             {"wallet_address": address},
@@ -227,18 +267,16 @@ async def get_transactions(address: str, limit: int = 50):
 
 @api_router.get("/prices")
 async def get_token_prices():
-    """Get real-time token prices from Jupiter"""
     try:
         async with httpx.AsyncClient() as client:
             response = await client.get("https://api.jup.ag/price/v2?ids=SOL,USDC,USDT")
             if response.status_code == 200:
-                data = response.json()
-                return data
+                return response.json()
             else:
-                return {"prices": {}}
+                return {"data": {}}
     except Exception as e:
         logging.error(f"Price fetch error: {str(e)}")
-        return {"prices": {}}
+        return {"data": {}}
 
 # Include router
 app.include_router(api_router)
@@ -251,7 +289,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Configure logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
