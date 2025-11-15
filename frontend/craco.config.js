@@ -60,8 +60,8 @@ const webpackConfig = {
       // Add alias for process/browser
       webpackConfig.resolve.alias = {
         ...webpackConfig.resolve.alias,
-        'process/browser': require.resolve('process'),
-        'process/browser.js': require.resolve('process'),
+        'process/browser': path.resolve(__dirname, 'src/polyfills/process-browser.js'),
+        'process/browser.js': path.resolve(__dirname, 'src/polyfills/process-browser.js'),
       };
 
       // Completely disable source-map-loader to avoid ENOENT errors
