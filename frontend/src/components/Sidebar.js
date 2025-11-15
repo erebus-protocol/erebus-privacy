@@ -41,13 +41,6 @@ const Sidebar = ({ balance, loading, walletAddress }) => {
       description: 'Send tokens' 
     },
     { 
-      id: 'bridge', 
-      label: 'Bridge', 
-      icon: Network, 
-      path: '/dashboard?tab=bridge',
-      description: 'Cross-chain' 
-    },
-    { 
       id: 'history', 
       label: 'History', 
       icon: Clock, 
