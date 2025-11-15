@@ -75,11 +75,11 @@ const LandingPage = () => {
             muted 
             playsInline
             className="absolute inset-0 w-full h-full object-cover"
-            style={{ opacity: '0.3', filter: 'brightness(0.6)' }}
+            style={{ opacity: '0.6', filter: 'brightness(1.1)' }}
           >
             <source src="https://customer-assets.emergentagent.com/job_erebus-finance/artifacts/i102lnpk_Looped-Particles-2025-10-17-00-14-36-Utc.mp4" type="video/mp4" />
           </video>
-          <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/70"></div>
         </div>
 
         <div className="relative z-10 max-w-6xl mx-auto px-6 text-center">
