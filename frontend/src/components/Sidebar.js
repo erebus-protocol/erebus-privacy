@@ -184,28 +184,6 @@ const Sidebar = ({ balance, loading, walletAddress }) => {
           </div>
         </nav>
 
-        {/* Footer Links */}
-        <div className="p-4 border-t border-[var(--dark-border)] space-y-3">
-          <a
-            href="https://solscan.io"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 text-sm text-gray-500 hover:text-[var(--gold-primary)] transition-colors"
-          >
-            <ExternalLink className="h-4 w-4" />
-            <span>Solscan Explorer</span>
-          </a>
-          <a
-            href="https://docs.solana.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 text-sm text-gray-500 hover:text-[var(--gold-primary)] transition-colors"
-          >
-            <ExternalLink className="h-4 w-4" />
-            <span>Solana Docs</span>
-          </a>
-        </div>
-
         {/* Privacy Badge */}
         <div className="p-4 mx-4 mb-4 bg-gradient-to-br from-[var(--gold-primary)]/10 to-[var(--gold-secondary)]/10 rounded-lg border border-[var(--gold-accent)]/30">
           <div className="flex items-center gap-2 mb-1">
