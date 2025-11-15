@@ -56,10 +56,14 @@ const webpackConfig = {
 
       // Provide global Buffer and process
       const webpack = require('webpack');
+      webpackConfig.plugins = webpackConfig.plugins || [];
       webpackConfig.plugins.push(
         new webpack.ProvidePlugin({
           Buffer: ['buffer', 'Buffer'],
-          process: 'process/browser',
+          process: 'process',
+        }),
+        new webpack.DefinePlugin({
+          'process.env': JSON.stringify(process.env),
         })
       );
 
