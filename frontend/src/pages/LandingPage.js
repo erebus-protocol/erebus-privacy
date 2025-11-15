@@ -250,6 +250,28 @@ const LandingPage = () => {
           }
         }
 
+        .wallet-connect-wrapper :global(.wallet-adapter-button) {
+          background: linear-gradient(to right, #D4AF37, #FFD700) !important;
+          color: #000 !important;
+          font-weight: 600 !important;
+          border: 2px solid transparent !important;
+          border-radius: 9999px !important;
+          padding: 1.5rem 2rem !important;
+          font-size: 1.125rem !important;
+          transition: all 0.3s ease !important;
+          box-shadow: 0 0 20px rgba(255, 215, 0, 0.4) !important;
+          animation: fadeInUp 1.2s ease-out;
+        }
+
+        .wallet-connect-wrapper :global(.wallet-adapter-button:hover) {
+          background: linear-gradient(to right, #FFD700, #D4AF37) !important;
+          transform: translateY(-2px);
+        }
+
+        .wallet-connect-wrapper :global(.wallet-adapter-button-trigger) {
+          background: linear-gradient(to right, #D4AF37, #FFD700) !important;
+        }
+
         .feature-card {
           background: rgba(26, 26, 26, 0.8);
           border: 1px solid rgba(255, 215, 0, 0.2);
