@@ -1,28 +1,8 @@
-import { useEffect, useRef } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
-import { Network } from 'lucide-react';
-import WormholeConnect from '@wormhole-foundation/wormhole-connect';
+import { Network, ExternalLink } from 'lucide-react';
+import { Button } from './ui/button';
 
 const BridgeComponent = () => {
-  const wormholeConfig = {
-    network: 'Mainnet',
-    chains: ['Solana', 'Ethereum', 'Polygon', 'Avalanche', 'Bsc'],
-    ui: {
-      title: 'Erebus Bridge',
-      defaultInputs: {
-        fromChain: 'Solana',
-      },
-    },
-  };
-
-  const wormholeTheme = {
-    mode: 'dark',
-    primary: '#FFD700', // Gold
-    secondary: '#FFA500',
-    background: '#0a0a0a',
-    text: '#ffffff',
-  };
-
   return (
     <Card className="bg-[var(--dark-surface)] border-[var(--dark-border)]" data-testid="bridge-card">
       <CardHeader>
@@ -35,29 +15,51 @@ const BridgeComponent = () => {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="wormhole-connect-container" data-testid="wormhole-widget">
-          <WormholeConnect config={wormholeConfig} theme={wormholeTheme} />
-        </div>
+        <div className="space-y-6">
+          {/* Wormhole Connect Iframe */}
+          <div className="relative" style={{ height: '650px' }}>
+            <iframe
+              src="https://connect.wormhole.com"
+              title="Wormhole Connect"
+              className="w-full h-full rounded-lg border border-[var(--dark-border)]"
+              allow="clipboard-write"
+              data-testid="wormhole-iframe"
+            />
+          </div>
 
-        <div className="mt-6 p-4 bg-[var(--dark-bg)] rounded-lg border border-[var(--dark-border)]">
-          <p className="text-xs text-gray-400">
-            🌉 Bridge tokens between Solana and other chains securely through Wormhole.
-          </p>
+          {/* Info Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="p-4 bg-[var(--dark-bg)] rounded-lg border border-[var(--dark-border)]">
+              <p className="text-[var(--gold-primary)] font-semibold mb-2">Supported Chains</p>
+              <p className="text-sm text-gray-400">Solana, Ethereum, Polygon, Avalanche, BSC, Arbitrum, Optimism, and more</p>
+            </div>
+            <div className="p-4 bg-[var(--dark-bg)] rounded-lg border border-[var(--dark-border)]">
+              <p className="text-[var(--gold-primary)] font-semibold mb-2">Supported Tokens</p>
+              <p className="text-sm text-gray-400">SOL, ETH, USDC, USDT, wETH, wBTC, and 100+ tokens</p>
+            </div>
+          </div>
+
+          {/* Alternative Portal Button */}
+          <div className="flex justify-center">
+            <Button
+              onClick={() => window.open('https://www.portalbridge.com', '_blank')}
+              variant="outline"
+              className="border-[var(--gold-primary)] text-[var(--gold-primary)] hover:bg-[var(--gold-primary)] hover:text-black"
+              data-testid="open-portal-btn"
+            >
+              Open Portal Bridge
+              <ExternalLink className="ml-2 h-4 w-4" />
+            </Button>
+          </div>
+
+          {/* Info Note */}
+          <div className="p-4 bg-blue-500/10 rounded-lg border border-blue-500/20">
+            <p className="text-xs text-blue-400">
+              🌉 Wormhole Connect powered by Wormhole Foundation. Bridge assets securely across multiple chains with low fees and fast finality.
+            </p>
+          </div>
         </div>
       </CardContent>
-
-      <style jsx>{`
-        .wormhole-connect-container {
-          min-height: 500px;
-          border-radius: 12px;
-          overflow: hidden;
-        }
-        
-        /* Override Wormhole Connect styles to match Erebus theme */
-        :global(.wormhole-connect) {
-          background: transparent !important;
-        }
-      `}</style>
     </Card>
   );
 };
