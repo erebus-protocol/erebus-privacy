@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
-import { Shield, Lock, Zap, ArrowRight, Github, Twitter, Sparkles } from 'lucide-react';
+import { Shield, Lock, Zap, ArrowRight, Github, Twitter, Sparkles, ChevronRight } from 'lucide-react';
 import { Button } from '../components/ui/button';
+import Lottie from 'lottie-react';
+import secureLockAnimation from '../assets/secure-lock.json';
 
 const LandingPage = () => {
   const navigate = useNavigate();
