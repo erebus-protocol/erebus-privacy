@@ -481,14 +481,45 @@ template ErebusTransfer() {
           background: linear-gradient(to right, #D4AF37, #FFD700) !important;
         }
 
-        .stat-card-new {
+        .stat-card-highlight {
+          text-align: center;
+          padding: 3rem 2rem;
+          background: rgba(26, 26, 26, 0.5);
+          border: 2px solid rgba(255, 215, 0, 0.1);
+          border-radius: 16px;
+          transition: all 0.3s ease;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .stat-card-highlight::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.1), transparent);
+          transition: left 0.5s ease;
+        }
+
+        .stat-card-highlight:hover::before {
+          left: 100%;
+        }
+
+        .stat-card-highlight:hover {
+          transform: translateY(-8px);
+          border-color: var(--gold-primary);
+          box-shadow: 0 12px 40px rgba(255, 215, 0, 0.3);
+          background: rgba(26, 26, 26, 0.8);
+        }
+
+        .stat-icon {
           transition: all 0.3s ease;
         }
 
-        .stat-card-new:hover {
-          transform: translateY(-4px);
-          border-color: var(--gold-primary);
-          box-shadow: 0 8px 24px rgba(255, 215, 0, 0.3);
+        .stat-card-highlight:hover .stat-icon {
+          transform: scale(1.15) rotate(5deg);
         }
 
         .feature-card-new {
