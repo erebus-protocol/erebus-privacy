@@ -14,34 +14,6 @@ const TokenSearchModal = ({ isOpen, onClose, onSelectToken, currentToken }) => {
   const [filteredTokens, setFilteredTokens] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (isOpen) {
-      fetchTokens();
-    }
-  }, [isOpen]);
-
-  useEffect(() => {
-    if (searchQuery) {
-      // Check if it looks like a contract address (44 characters, base58)
-      const isAddress = searchQuery.length >= 32 && /^[1-9A-HJ-NP-Za-km-z]+$/.test(searchQuery);
-      
-      if (isAddress && searchQuery.length >= 40) {
-        // Search by contract address
-        searchTokenByAddress(searchQuery);
-      } else {
-        // Regular search by symbol/name
-        const filtered = tokens.filter(token =>
-          token.symbol.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          token.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          token.address.toLowerCase().includes(searchQuery.toLowerCase())
-        );
-        setFilteredTokens(filtered);
-      }
-    } else {
-      setFilteredTokens(tokens);
-    }
-  }, [searchQuery, tokens]);
-
   const fetchTokens = async () => {
     try {
       setLoading(true);
@@ -60,16 +32,52 @@ const TokenSearchModal = ({ isOpen, onClose, onSelectToken, currentToken }) => {
       setLoading(true);
       const response = await axios.get(`${API}/token-info/${address}`);
       if (response.data) {
-        // Add to filtered list
+        // Show the found token at the top
         setFilteredTokens([response.data]);
       }
     } catch (error) {
       console.error('Error searching token by address:', error);
+      // Show "not found" message
       setFilteredTokens([]);
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (isOpen) {
+      fetchTokens();
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
+    const searchTokens = async () => {
+      if (searchQuery) {
+        // Check if it looks like a Solana address (32-44 characters, base58)
+        const trimmedQuery = searchQuery.trim();
+        const isAddress = trimmedQuery.length >= 32 && /^[1-9A-HJ-NP-Za-km-z]+$/.test(trimmedQuery);
+        
+        if (isAddress && trimmedQuery.length >= 32) {
+          // Search by contract address
+          await searchTokenByAddress(trimmedQuery);
+        } else {
+          // Regular search by symbol/name/address
+          const filtered = tokens.filter(token =>
+            token.symbol.toLowerCase().includes(trimmedQuery.toLowerCase()) ||
+            token.name.toLowerCase().includes(trimmedQuery.toLowerCase()) ||
+            token.address.toLowerCase().includes(trimmedQuery.toLowerCase())
+          );
+          setFilteredTokens(filtered);
+        }
+      } else {
+        setFilteredTokens(tokens);
+      }
+    };
+
+    // Debounce search
+    const timer = setTimeout(searchTokens, 300);
+    return () => clearTimeout(timer);
+  }, [searchQuery, tokens]);
 
   const handleSelectToken = (token) => {
     onSelectToken(token);
