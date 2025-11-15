@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
-import { Bridge } from 'lucide-react';
+import { Network } from 'lucide-react';
 
 const BridgeComponent = () => {
   const wormholeRef = useRef(null);
