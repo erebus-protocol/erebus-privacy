@@ -60,7 +60,7 @@ const BridgeComponent = () => {
         >
           <div className="flex items-center justify-center h-[500px]">
             <div className="text-center space-y-4">
-              <Bridge className="h-16 w-16 mx-auto text-[var(--gold-primary)] animate-pulse" />
+              <Network className="h-16 w-16 mx-auto text-[var(--gold-primary)] animate-pulse" />
               <p className="text-gray-400">Loading Wormhole Bridge...</p>
               <p className="text-xs text-gray-500">If the widget doesn't load, please refresh the page</p>
             </div>
