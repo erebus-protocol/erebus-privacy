@@ -237,6 +237,74 @@ async def get_token_balance(wallet: str, mint: str):
         logging.error(f"Token balance error: {str(e)}")
         return {"balance": 0, "decimals": 0, "mint": mint, "raw_balance": "0"}
 
+@api_router.get("/wallet-tokens/{wallet}")
+async def get_wallet_tokens(wallet: str):
+    """Get all tokens in wallet with balances"""
+    try:
+        wallet_pubkey = Pubkey.from_string(wallet)
+        
+        # Get all token accounts owned by wallet
+        response = await solana_client.get_token_accounts_by_owner_json_parsed(
+            wallet_pubkey,
+            {"programId": Pubkey.from_string("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA")}
+        )
+        
+        tokens = []
+        popular_tokens = await get_token_list()
+        
+        if response.value:
+            for account in response.value:
+                try:
+                    parsed_data = account.account.data.parsed
+                    token_info = parsed_data['info']
+                    mint_address = token_info['mint']
+                    balance_data = token_info['tokenAmount']
+                    
+                    # Only include tokens with balance > 0
+                    balance = float(balance_data['uiAmount']) if balance_data['uiAmount'] else 0
+                    if balance <= 0:
+                        continue
+                    
+                    # Find token metadata from popular list
+                    token_metadata = None
+                    for pop_token in popular_tokens:
+                        if pop_token['address'] == mint_address:
+                            token_metadata = pop_token
+                            break
+                    
+                    # If not in popular list, get from chain
+                    if not token_metadata:
+                        try:
+                            token_metadata = await get_token_info(mint_address)
+                        except:
+                            token_metadata = {
+                                "address": mint_address,
+                                "symbol": f"{mint_address[:4].upper()}...{mint_address[-4:].upper()}",
+                                "name": "Unknown Token",
+                                "decimals": balance_data['decimals'],
+                                "logoURI": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/So11111111111111111111111111111111111111112/logo.png",
+                                "tags": ["custom"]
+                            }
+                    
+                    tokens.append({
+                        **token_metadata,
+                        "balance": balance,
+                        "raw_balance": balance_data['amount']
+                    })
+                    
+                except Exception as e:
+                    logging.error(f"Error parsing token account: {e}")
+                    continue
+        
+        # Sort by balance (highest first)
+        tokens.sort(key=lambda x: x['balance'], reverse=True)
+        
+        return {"tokens": tokens, "count": len(tokens)}
+        
+    except Exception as e:
+        logging.error(f"Error fetching wallet tokens: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error fetching wallet tokens: {str(e)}")
+
 @api_router.get("/token-info/{mint}")
 async def get_token_info(mint: str):
     """Get token metadata by mint address"""
