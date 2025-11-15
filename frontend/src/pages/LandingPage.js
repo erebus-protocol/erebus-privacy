@@ -525,38 +525,129 @@ const LandingPage = () => {
           transform: scale(1.1);
         }
 
-        .tech-item {
-          transition: all 0.3s ease;
-        }
-
-        .tech-item:hover {
-          border-color: var(--gold-primary);
-          background: rgba(0, 0, 0, 0.5);
-          transform: translateX(8px);
-        }
-
-        .code-block {
-          transition: all 0.3s ease;
-        }
-
-        .code-block:hover {
-          border-color: var(--gold-primary);
-          box-shadow: 0 4px 16px rgba(255, 215, 0, 0.1);
-        }
-
-        .ritual-card {
+        .why-card {
           padding: 2rem;
-          background: rgba(0, 0, 0, 0.3);
+          background: rgba(0, 0, 0, 0.4);
           border: 1px solid rgba(255, 215, 0, 0.1);
-          border-radius: 16px;
+          border-radius: 20px;
+          transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+          position: relative;
+          overflow: hidden;
+        }
+
+        .why-card::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          height: 3px;
+          background: linear-gradient(90deg, var(--gold-primary), var(--gold-secondary));
+          transform: scaleX(0);
+          transition: transform 0.4s ease;
+        }
+
+        .why-card:hover::before {
+          transform: scaleX(1);
+        }
+
+        .why-card:hover {
+          transform: translateY(-8px);
+          border-color: var(--gold-primary);
+          background: rgba(0, 0, 0, 0.7);
+          box-shadow: 0 20px 50px rgba(255, 215, 0, 0.2);
+        }
+
+        .why-icon {
+          width: 60px;
+          height: 60px;
+          background: linear-gradient(135deg, rgba(212, 175, 55, 0.2), rgba(255, 215, 0, 0.1));
+          border-radius: 12px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: var(--gold-primary);
+          transition: all 0.4s ease;
+        }
+
+        .why-card:hover .why-icon {
+          background: linear-gradient(135deg, rgba(212, 175, 55, 0.3), rgba(255, 215, 0, 0.2));
+          transform: scale(1.1) rotate(5deg);
+        }
+
+        .how-card {
+          padding: 3rem;
+          background: rgba(0, 0, 0, 0.3);
+          border: 1px solid rgba(255, 215, 0, 0.15);
+          border-radius: 24px;
+          transition: all 0.4s ease;
+        }
+
+        .how-card:hover {
+          background: rgba(0, 0, 0, 0.5);
+          border-color: var(--gold-primary);
+          box-shadow: 0 12px 40px rgba(255, 215, 0, 0.15);
+        }
+
+        .step-number-modern {
+          font-size: 4rem;
+          font-weight: 900;
+          background: linear-gradient(135deg, var(--gold-primary), var(--gold-secondary));
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+          line-height: 1;
+          opacity: 0.3;
+          transition: all 0.4s ease;
+        }
+
+        .how-card:hover .step-number-modern {
+          opacity: 1;
+          transform: scale(1.1);
+        }
+
+        .stats-modern {
           transition: all 0.3s ease;
         }
 
-        .ritual-card:hover {
-          border-color: var(--gold-primary);
-          background: rgba(0, 0, 0, 0.5);
-          transform: translateY(-8px);
-          box-shadow: 0 12px 32px rgba(255, 215, 0, 0.2);
+        .stats-modern:hover {
+          transform: translateY(-4px);
+        }
+
+        .stats-modern:hover .text-5xl {
+          text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+
+        .cta-button-modern {
+          background: linear-gradient(135deg, var(--gold-primary), var(--gold-secondary));
+          color: #000;
+          font-weight: 700;
+          border-radius: 9999px;
+          transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+          box-shadow: 0 10px 40px rgba(255, 215, 0, 0.3);
+          border: none;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .cta-button-modern::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+          transition: left 0.5s ease;
+        }
+
+        .cta-button-modern:hover::before {
+          left: 100%;
+        }
+
+        .cta-button-modern:hover {
+          transform: translateY(-4px);
+          box-shadow: 0 20px 60px rgba(255, 215, 0, 0.5);
         }
       `}</style>
     </div>
