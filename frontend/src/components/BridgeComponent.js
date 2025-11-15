@@ -44,7 +44,7 @@ const BridgeComponent = () => {
     <Card className="bg-[var(--dark-surface)] border-[var(--dark-border)]" data-testid="bridge-card">
       <CardHeader>
         <CardTitle className="text-[var(--gold-primary)] flex items-center gap-2">
-          <Bridge className="h-5 w-5" />
+          <Network className="h-5 w-5" />
           Cross-Chain Bridge
         </CardTitle>
         <CardDescription className="text-gray-400">
