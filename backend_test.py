@@ -13,7 +13,7 @@ from solders.keypair import Keypair
 from solders.pubkey import Pubkey
 
 class ErebusBackendTester:
-    def __init__(self, base_url="https://solana-zk-shield.preview.emergentagent.com"):
+    def __init__(self, base_url="https://erebus-finance.preview.emergentagent.com"):
         self.base_url = base_url
         self.tests_run = 0
         self.tests_passed = 0
