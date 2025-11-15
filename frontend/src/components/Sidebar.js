@@ -12,7 +12,7 @@ import {
   ExternalLink
 } from 'lucide-react';
 
-const Sidebar = () => {
+const Sidebar = ({ balance, loading, walletAddress }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
