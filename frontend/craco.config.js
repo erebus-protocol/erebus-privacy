@@ -42,6 +42,7 @@ const webpackConfig = {
         stream: require.resolve('stream-browserify'),
         buffer: require.resolve('buffer'),
         process: require.resolve('process'),
+        'process/browser': require.resolve('process'),
         assert: require.resolve('assert'),
         url: require.resolve('url'),
         https: require.resolve('https-browserify'),
@@ -52,6 +53,13 @@ const webpackConfig = {
         fs: false,
         path: false,
         zlib: false,
+      };
+      
+      // Add alias for process/browser
+      webpackConfig.resolve.alias = {
+        ...webpackConfig.resolve.alias,
+        'process/browser': require.resolve('process'),
+        'process/browser.js': require.resolve('process'),
       };
 
       // Disable source-map-loader for node_modules to avoid ENOENT errors
