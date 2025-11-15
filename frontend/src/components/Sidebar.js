@@ -111,7 +111,25 @@ const Sidebar = ({ balance, loading, walletAddress }) => {
               className="h-7"
             />
           </div>
-          <p className="text-xs text-gray-500">ZK Privacy Protocol</p>
+          <p className="text-xs text-gray-500 mb-4">ZK Privacy Protocol</p>
+
+          {/* Wallet Balance Info */}
+          <div className="bg-gradient-to-br from-[var(--gold-primary)]/10 to-[var(--gold-secondary)]/10 rounded-lg p-4 border border-[var(--gold-accent)]/30">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs text-gray-400">Wallet Balance</span>
+              {loading && (
+                <div className="w-4 h-4 border-2 border-[var(--gold-primary)] border-t-transparent rounded-full animate-spin"></div>
+              )}
+            </div>
+            <div className="text-2xl font-bold text-[var(--gold-primary)] mb-1" data-testid="sidebar-balance">
+              {loading ? '...' : `${balance.toFixed(4)} SOL`}
+            </div>
+            {walletAddress && (
+              <div className="text-xs text-gray-500 font-mono">
+                {walletAddress.slice(0, 4)}...{walletAddress.slice(-4)}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Navigation Menu */}
