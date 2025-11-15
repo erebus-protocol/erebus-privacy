@@ -79,7 +79,7 @@ const LandingPage = () => {
         </div>
 
         <div className="relative z-10 max-w-6xl mx-auto px-6 text-center">
-          <h1 className="hero-headline text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-bold mb-6 tracking-wider" style={{ 
+          <h1 className="hero-headline text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold mb-6 tracking-wider" style={{ 
             color: 'var(--gold-primary)',
             fontFamily: 'Georgia, "Times New Roman", serif',
             textShadow: '0 0 30px rgba(255, 215, 0, 0.5)',
@@ -88,10 +88,10 @@ const LandingPage = () => {
             THE UNDERWORLD<br />OF PRIVACY
           </h1>
           
-          <p className="text-lg sm:text-xl lg:text-2xl mb-12 text-[var(--gold-primary)] max-w-3xl mx-auto italic font-light" style={{
+          <p className="text-base sm:text-lg lg:text-xl mb-12 text-[var(--gold-primary)] max-w-3xl mx-auto italic font-light leading-relaxed" style={{
             textShadow: '0 0 20px rgba(255, 215, 0, 0.3)'
           }}>
-            Secure and private transactions using zero-knowledge cryptography.<br />
+            Secure and private transactions using zero-knowledge cryptography.
             Protect your financial data with advanced privacy technology.
           </p>
 
@@ -105,24 +105,10 @@ const LandingPage = () => {
               Learn More
             </Button>
             
-            {/* Hidden WalletMultiButton for functionality */}
-            <div className="hidden">
-              <WalletMultiButton />
+            {/* Wallet Adapter Button styled as custom button */}
+            <div className="wallet-connect-wrapper">
+              <WalletMultiButton className="hero-wallet-btn" data-testid="hero-wallet-connect-btn" />
             </div>
-            
-            <Button 
-              size="lg"
-              className="hero-btn text-black bg-gradient-to-r from-[#D4AF37] to-[#FFD700] hover:from-[#FFD700] hover:to-[#D4AF37] transition-all duration-300 px-8 py-6 text-lg font-semibold rounded-full shadow-[0_0_20px_rgba(255,215,0,0.4)]"
-              data-testid="hero-wallet-connect-btn"
-              onClick={() => {
-                const walletButton = document.querySelector('.wallet-adapter-button');
-                if (walletButton) {
-                  walletButton.click();
-                }
-              }}
-            >
-              Connect Wallet
-            </Button>
           </div>
         </div>
       </section>
