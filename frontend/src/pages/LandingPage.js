@@ -96,7 +96,7 @@ const LandingPage = () => {
             Protect your financial data with advanced privacy technology.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             {!connected ? (
               <>
                 <Button 
@@ -130,20 +130,35 @@ const LandingPage = () => {
               </>
             )}
           </div>
+        </div>
+      </section>
 
-          {/* Stats Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-4xl mx-auto">
-            <div className="stat-card-new p-6 rounded-xl backdrop-blur-sm bg-black/30 border border-[var(--gold-primary)]/20">
-              <div className="text-3xl font-bold text-[var(--gold-primary)] mb-2">SECURE</div>
-              <div className="text-gray-400 text-sm">Privacy</div>
+      {/* Stats Section */}
+      <section className="py-20 px-6 bg-[var(--dark-bg)] relative border-t border-b border-[var(--gold-primary)]/10">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
+            <div className="stat-card-highlight group">
+              <div className="stat-icon mb-4">
+                <Shield className="h-16 w-16 mx-auto text-[var(--gold-primary)]" />
+              </div>
+              <div className="text-4xl sm:text-5xl font-bold text-[var(--gold-primary)] mb-3">SECURE</div>
+              <div className="text-gray-300 text-lg">Privacy</div>
             </div>
-            <div className="stat-card-new p-6 rounded-xl backdrop-blur-sm bg-black/30 border border-[var(--gold-primary)]/20">
-              <div className="text-3xl font-bold text-[var(--gold-primary)] mb-2">FAST</div>
-              <div className="text-gray-400 text-sm">Transactions</div>
+            
+            <div className="stat-card-highlight group">
+              <div className="stat-icon mb-4">
+                <Zap className="h-16 w-16 mx-auto text-[var(--gold-primary)]" />
+              </div>
+              <div className="text-4xl sm:text-5xl font-bold text-[var(--gold-primary)] mb-3">FAST</div>
+              <div className="text-gray-300 text-lg">Transactions</div>
             </div>
-            <div className="stat-card-new p-6 rounded-xl backdrop-blur-sm bg-black/30 border border-[var(--gold-primary)]/20">
-              <div className="text-3xl font-bold text-[var(--gold-primary)] mb-2">PROVEN</div>
-              <div className="text-gray-400 text-sm">Technology</div>
+            
+            <div className="stat-card-highlight group">
+              <div className="stat-icon mb-4">
+                <Lock className="h-16 w-16 mx-auto text-[var(--gold-primary)]" />
+              </div>
+              <div className="text-4xl sm:text-5xl font-bold text-[var(--gold-primary)] mb-3">PROVEN</div>
+              <div className="text-gray-300 text-lg">Technology</div>
             </div>
           </div>
         </div>
