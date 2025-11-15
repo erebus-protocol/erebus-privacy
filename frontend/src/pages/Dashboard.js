@@ -7,7 +7,6 @@ import Sidebar from '../components/Sidebar';
 import SwapComponent from '../components/SwapComponent';
 import TransferSOL from '../components/TransferSOL';
 import TransferToken from '../components/TransferToken';
-import BridgeComponent from '../components/BridgeComponent';
 import TransactionHistory from '../components/TransactionHistory';
 
 const Dashboard = () => {
