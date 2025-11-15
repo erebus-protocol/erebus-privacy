@@ -73,31 +73,29 @@ const LandingPage = () => {
             muted 
             playsInline
             className="absolute inset-0 w-full h-full object-cover"
-            style={{ opacity: '0.4', filter: 'brightness(0.8)' }}
+            style={{ opacity: '0.3', filter: 'brightness(0.6)' }}
           >
-            <source src="https://customer-assets.emergentagent.com/job_erebus-finance/artifacts/40q569i0_Gold-Particles-Wave-2025-10-16-23-56-55-Utc%281%29.mp4" type="video/mp4" />
+            <source src="https://customer-assets.emergentagent.com/job_erebus-finance/artifacts/i102lnpk_Looped-Particles-2025-10-17-00-14-36-Utc.mp4" type="video/mp4" />
           </video>
-          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/90"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black"></div>
         </div>
 
         <div className="relative z-10 max-w-6xl mx-auto px-6 text-center">
-          <h1 className="hero-headline text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold mb-6 tracking-wider" style={{ 
+          <h1 className="hero-headline text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold mb-6 tracking-wider leading-tight" style={{ 
             color: 'var(--gold-primary)',
             fontFamily: 'Georgia, "Times New Roman", serif',
             textShadow: '0 0 30px rgba(255, 215, 0, 0.5)',
             letterSpacing: '0.05em'
           }}>
-            THE UNDERWORLD<br />OF PRIVACY
+            The Underworld<br />of Privacy
           </h1>
           
-          <p className="text-base sm:text-lg lg:text-xl mb-12 text-[var(--gold-primary)] max-w-4xl mx-auto italic font-light leading-relaxed" style={{
-            textShadow: '0 0 20px rgba(255, 215, 0, 0.3)'
-          }}>
+          <p className="text-base sm:text-lg lg:text-xl mb-12 text-gray-300 max-w-3xl mx-auto font-light leading-relaxed">
             Secure and private transactions using zero-knowledge cryptography.<br />
             Protect your financial data with advanced privacy technology.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
             {!connected ? (
               <>
                 <Button 
@@ -109,7 +107,6 @@ const LandingPage = () => {
                   Learn More
                 </Button>
                 
-                {/* Wallet Adapter Button styled as custom button */}
                 <div className="wallet-connect-wrapper">
                   <WalletMultiButton className="hero-wallet-btn" data-testid="hero-wallet-connect-btn" />
                 </div>
@@ -126,12 +123,27 @@ const LandingPage = () => {
                   Go to Dashboard
                 </Button>
                 
-                {/* Show wallet button when connected for disconnect option */}
                 <div className="wallet-connect-wrapper">
                   <WalletMultiButton className="hero-wallet-btn" />
                 </div>
               </>
             )}
+          </div>
+
+          {/* Stats Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-4xl mx-auto">
+            <div className="stat-card-new p-6 rounded-xl backdrop-blur-sm bg-black/30 border border-[var(--gold-primary)]/20">
+              <div className="text-3xl font-bold text-[var(--gold-primary)] mb-2">SECURE</div>
+              <div className="text-gray-400 text-sm">Privacy</div>
+            </div>
+            <div className="stat-card-new p-6 rounded-xl backdrop-blur-sm bg-black/30 border border-[var(--gold-primary)]/20">
+              <div className="text-3xl font-bold text-[var(--gold-primary)] mb-2">FAST</div>
+              <div className="text-gray-400 text-sm">Transactions</div>
+            </div>
+            <div className="stat-card-new p-6 rounded-xl backdrop-blur-sm bg-black/30 border border-[var(--gold-primary)]/20">
+              <div className="text-3xl font-bold text-[var(--gold-primary)] mb-2">PROVEN</div>
+              <div className="text-gray-400 text-sm">Technology</div>
+            </div>
           </div>
         </div>
       </section>
