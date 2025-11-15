@@ -255,16 +255,28 @@ async def get_wallet_tokens(wallet: str):
         if response.value:
             for account in response.value:
                 try:
-                    # Access parsed data correctly
-                    account_data = account.account.data
-                    if hasattr(account_data, 'parsed'):
+                    # Handle both dict and object structures
+                    if isinstance(account, dict):
+                        account_data = account.get('account', {}).get('data', {})
+                    else:
+                        account_data = account.account.data
+                    
+                    # Extract parsed data
+                    if isinstance(account_data, dict):
+                        parsed_data = account_data.get('parsed', account_data)
+                    elif hasattr(account_data, 'parsed'):
                         parsed_data = account_data.parsed
                     else:
                         parsed_data = account_data
                     
-                    token_info = parsed_data['info']
-                    mint_address = token_info['mint']
-                    balance_data = token_info['tokenAmount']
+                    # Get token info
+                    if isinstance(parsed_data, dict):
+                        token_info = parsed_data.get('info', {})
+                    else:
+                        token_info = parsed_data['info']
+                    
+                    mint_address = token_info.get('mint') if isinstance(token_info, dict) else token_info['mint']
+                    balance_data = token_info.get('tokenAmount') if isinstance(token_info, dict) else token_info['tokenAmount']
                     
                     # Only include tokens with balance > 0
                     ui_amount = balance_data.get('uiAmount')
