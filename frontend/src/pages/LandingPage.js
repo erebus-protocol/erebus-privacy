@@ -402,6 +402,33 @@ template ErebusTransfer() {
           animation: fadeInUp 1s ease-out;
         }
 
+        .hero-headline-shine {
+          background: linear-gradient(
+            90deg,
+            #B8860B 0%,
+            #FFD700 25%,
+            #FFFACD 50%,
+            #FFD700 75%,
+            #B8860B 100%
+          );
+          background-size: 200% auto;
+          background-clip: text;
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          animation: shine 3s linear infinite, fadeInUp 1s ease-out;
+          text-shadow: none;
+          filter: drop-shadow(0 0 30px rgba(255, 215, 0, 0.5));
+        }
+
+        @keyframes shine {
+          0% {
+            background-position: 0% center;
+          }
+          100% {
+            background-position: 200% center;
+          }
+        }
+
         .hero-btn {
           animation: fadeInUp 1.2s ease-out;
         }
