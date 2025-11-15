@@ -34,6 +34,7 @@ function App() {
               <Routes>
                 <Route path="/" element={<LandingPage />} />
                 <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/docs" element={<DocsPage />} />
               </Routes>
             </BrowserRouter>
           </div>
