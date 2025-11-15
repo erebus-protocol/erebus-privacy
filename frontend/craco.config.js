@@ -65,11 +65,25 @@ const webpackConfig = {
         return rule;
       });
 
+      // Add rule to handle .mjs files
+      webpackConfig.module.rules.push({
+        test: /\.mjs$/,
+        include: /node_modules/,
+        type: 'javascript/auto'
+      });
+
+      // Resolve .mjs extensions
+      webpackConfig.resolve.extensions = [
+        ...(webpackConfig.resolve.extensions || []),
+        '.mjs'
+      ];
+
       // Ignore missing source maps
       webpackConfig.ignoreWarnings = [
         ...(webpackConfig.ignoreWarnings || []),
         /Failed to parse source map/,
-        /source-map-loader/
+        /source-map-loader/,
+        /Module build failed/
       ];
 
       // Provide global Buffer and process
