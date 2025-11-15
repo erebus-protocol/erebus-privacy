@@ -54,9 +54,9 @@ const TokenSearchModal = ({ isOpen, onClose, onSelectToken, currentToken }) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className=\"bg-[var(--dark-surface)] border-[var(--gold-accent)] max-w-md\" data-testid=\"token-search-modal\">
+      <DialogContent className="bg-[var(--dark-surface)] border-[var(--gold-accent)] max-w-md" data-testid="token-search-modal">
         <DialogHeader>
-          <DialogTitle className=\"text-[var(--gold-primary)]\">Select Token</DialogTitle>
+          <DialogTitle className="text-[var(--gold-primary)]">Select Token</DialogTitle>
         </DialogHeader>
 
         <div className=\"space-y-4\">
