@@ -110,7 +110,16 @@ const TokenSearchModal = ({ isOpen, onClose, onSelectToken, currentToken }) => {
                 <Loader2 className="h-8 w-8 animate-spin text-[var(--gold-primary)]" />
               </div>
             ) : filteredTokens.length === 0 ? (
-              <div className="text-center py-12 text-gray-500">No tokens found</div>
+              <div className="text-center py-12">
+                <div className="text-gray-500 mb-2">
+                  {searchQuery ? 'No tokens found' : 'Start typing to search'}
+                </div>
+                {searchQuery && searchQuery.length >= 32 && (
+                  <div className="text-xs text-gray-600 mt-2">
+                    Searched for: {searchQuery.slice(0, 8)}...{searchQuery.slice(-8)}
+                  </div>
+                )}
+              </div>
             ) : (
               <div className="space-y-1">
                 {filteredTokens.map((token) => (
@@ -136,8 +145,14 @@ const TokenSearchModal = ({ isOpen, onClose, onSelectToken, currentToken }) => {
                             Verified
                           </span>
                         )}
+                        {token.tags && token.tags.includes('custom') && (
+                          <span className="text-xs bg-yellow-500/20 text-yellow-400 px-2 py-0.5 rounded">
+                            Custom
+                          </span>
+                        )}
                       </div>
                       <div className="text-sm text-gray-500">{token.name}</div>
+                      <div className="text-xs text-gray-600 mt-0.5">{token.address.slice(0, 8)}...{token.address.slice(-8)}</div>
                     </div>
                   </button>
                 ))}
