@@ -80,7 +80,11 @@ const Dashboard = () => {
   return (
     <div className="dashboard flex h-screen overflow-hidden" data-testid="dashboard-container">
       {/* Sidebar */}
-      <Sidebar />
+      <Sidebar 
+        balance={balance} 
+        loading={loading} 
+        walletAddress={publicKey?.toBase58()} 
+      />
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
@@ -90,9 +94,7 @@ const Dashboard = () => {
             <div className="flex items-center gap-4">
               <div>
                 <h1 className="text-2xl font-bold text-white">Dashboard</h1>
-                <p className="text-sm text-gray-400">
-                  {publicKey?.toBase58().slice(0, 8)}...{publicKey?.toBase58().slice(-8)}
-                </p>
+                <p className="text-sm text-gray-400">Erebus Protocol - ZK Privacy System</p>
               </div>
             </div>
             <WalletMultiButton />
@@ -102,24 +104,6 @@ const Dashboard = () => {
         {/* Scrollable Content */}
         <div className="flex-1 overflow-y-auto">
           <div className="max-w-6xl mx-auto px-6 py-8">
-            {/* Balance Card */}
-            <Card className="mb-8 bg-[var(--dark-surface)] border-[var(--gold-accent)]" data-testid="balance-card">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-[var(--gold-primary)]">
-                  <Wallet className="h-5 w-5" />
-                  Wallet Balance
-                </CardTitle>
-                <CardDescription className="text-gray-400">
-                  Connected Wallet
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="text-4xl font-bold text-white" data-testid="sol-balance">
-                  {loading ? '...' : balance.toFixed(4)} SOL
-                </div>
-              </CardContent>
-            </Card>
-
             {/* Active Tab Content */}
             <div className="animate-fade-in">
               {renderContent()}
