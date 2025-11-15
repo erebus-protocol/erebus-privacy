@@ -241,6 +241,13 @@ async def get_token_balance(wallet: str, mint: str):
 async def get_token_info(mint: str):
     """Get token metadata by mint address"""
     try:
+        # First check if token is in our popular list
+        popular_tokens = await get_token_list()
+        for token in popular_tokens:
+            if token["address"] == mint:
+                return token
+        
+        # If not in list, fetch from chain
         mint_pubkey = Pubkey.from_string(mint)
         
         # Get account info to verify token exists
@@ -251,20 +258,24 @@ async def get_token_info(mint: str):
             data = account_info.value.data
             decimals = 9  # Default
             
-            # SPL Token Mint layout: first byte after 36 bytes is decimals
+            # SPL Token Mint layout: decimals is at byte 44
             if len(data) >= 44:
                 try:
                     decimals = data[44]
                 except:
                     decimals = 9
             
+            # Generate symbol from mint address
+            # Use a more recognizable pattern
+            symbol = f"TOKEN-{mint[:4].upper()}"
+            
             # Return basic token info
             return {
                 "address": mint,
-                "symbol": mint[:4].upper(),
-                "name": f"Token {mint[:8]}...",
+                "symbol": symbol,
+                "name": f"Custom Token ({mint[:8]}...{mint[-4:]})",
                 "decimals": decimals,
-                "logoURI": "https://via.placeholder.com/32",
+                "logoURI": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/So11111111111111111111111111111111111111112/logo.png",
                 "tags": ["custom"]
             }
         else:
