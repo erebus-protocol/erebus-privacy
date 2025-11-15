@@ -55,6 +55,22 @@ const TokenSearchModal = ({ isOpen, onClose, onSelectToken, currentToken }) => {
     }
   };
 
+  const searchTokenByAddress = async (address) => {
+    try {
+      setLoading(true);
+      const response = await axios.get(`${API}/token-info/${address}`);
+      if (response.data) {
+        // Add to filtered list
+        setFilteredTokens([response.data]);
+      }
+    } catch (error) {
+      console.error('Error searching token by address:', error);
+      setFilteredTokens([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleSelectToken = (token) => {
     onSelectToken(token);
     onClose();
