@@ -258,22 +258,28 @@ async def get_token_info(mint: str):
             data = account_info.value.data
             decimals = 9  # Default
             
-            # SPL Token Mint layout: decimals is at byte 44
-            if len(data) >= 44:
+            # SPL Token Mint layout:
+            # Bytes 0-35: mint authority option + mint authority pubkey
+            # Bytes 36-43: supply (u64)
+            # Byte 44: decimals (u8)
+            # Byte 45-76: is_initialized + freeze_authority option + freeze authority
+            if isinstance(data, bytes) and len(data) >= 45:
                 try:
-                    decimals = data[44]
-                except:
+                    # Decimals is at byte index 44 (0-indexed)
+                    decimals = int(data[44])
+                    logging.info(f"Parsed decimals for {mint}: {decimals}")
+                except Exception as e:
+                    logging.error(f"Error parsing decimals: {e}")
                     decimals = 9
             
             # Generate symbol from mint address
-            # Use a more recognizable pattern
-            symbol = f"TOKEN-{mint[:4].upper()}"
+            symbol = f"{mint[:4].upper()}...{mint[-4:].upper()}"
             
             # Return basic token info
             return {
                 "address": mint,
                 "symbol": symbol,
-                "name": f"Custom Token ({mint[:8]}...{mint[-4:]})",
+                "name": f"Custom Token",
                 "decimals": decimals,
                 "logoURI": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/So11111111111111111111111111111111111111112/logo.png",
                 "tags": ["custom"]
