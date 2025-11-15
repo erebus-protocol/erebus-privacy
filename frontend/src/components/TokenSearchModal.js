@@ -22,12 +22,21 @@ const TokenSearchModal = ({ isOpen, onClose, onSelectToken, currentToken }) => {
 
   useEffect(() => {
     if (searchQuery) {
-      const filtered = tokens.filter(token =>
-        token.symbol.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        token.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        token.address.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-      setFilteredTokens(filtered);
+      // Check if it looks like a contract address (44 characters, base58)
+      const isAddress = searchQuery.length >= 32 && /^[1-9A-HJ-NP-Za-km-z]+$/.test(searchQuery);
+      
+      if (isAddress && searchQuery.length >= 40) {
+        // Search by contract address
+        searchTokenByAddress(searchQuery);
+      } else {
+        // Regular search by symbol/name
+        const filtered = tokens.filter(token =>
+          token.symbol.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          token.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          token.address.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+        setFilteredTokens(filtered);
+      }
     } else {
       setFilteredTokens(tokens);
     }
