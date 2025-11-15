@@ -268,7 +268,7 @@ const LandingPage = () => {
                   Use any Solana wallet like Phantom or Solflare. No registration, no personal information required. Your privacy starts here.
                 </p>
               </div>
-              <div className="hidden lg:block w-32 h-32 rounded-full bg-gradient-to-br from-[var(--gold-primary)]/20 to-transparent border border-[var(--gold-primary)]/30 flex items-center justify-center">
+              <div className="hidden lg:flex w-32 h-32 rounded-full bg-gradient-to-br from-[var(--gold-primary)]/20 to-transparent border-2 border-[var(--gold-primary)]/30 items-center justify-center shrink-0">
                 <Shield className="h-16 w-16 text-[var(--gold-primary)]" />
               </div>
             </div>
@@ -281,7 +281,7 @@ const LandingPage = () => {
                   Send your assets into the Erebus protocol. Advanced cryptography shields your transaction from prying eyes, creating an unbreakable privacy layer.
                 </p>
               </div>
-              <div className="hidden lg:block w-32 h-32 rounded-full bg-gradient-to-br from-[var(--gold-primary)]/20 to-transparent border border-[var(--gold-primary)]/30 flex items-center justify-center">
+              <div className="hidden lg:flex w-32 h-32 rounded-full bg-gradient-to-br from-[var(--gold-primary)]/20 to-transparent border-2 border-[var(--gold-primary)]/30 items-center justify-center shrink-0">
                 <Lock className="h-16 w-16 text-[var(--gold-primary)]" />
               </div>
             </div>
@@ -294,7 +294,7 @@ const LandingPage = () => {
                   Swap tokens, transfer funds, or bridge assets - all with complete privacy. Your financial activity remains your secret.
                 </p>
               </div>
-              <div className="hidden lg:block w-32 h-32 rounded-full bg-gradient-to-br from-[var(--gold-primary)]/20 to-transparent border border-[var(--gold-primary)]/30 flex items-center justify-center">
+              <div className="hidden lg:flex w-32 h-32 rounded-full bg-gradient-to-br from-[var(--gold-primary)]/20 to-transparent border-2 border-[var(--gold-primary)]/30 items-center justify-center shrink-0">
                 <Zap className="h-16 w-16 text-[var(--gold-primary)]" />
               </div>
             </div>
