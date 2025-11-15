@@ -188,155 +188,206 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Advanced Technology Section */}
-      <section className="py-24 px-6 bg-[var(--dark-surface)]">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-12">
+      {/* Why Choose Erebus Section */}
+      <section className="py-24 px-6 bg-gradient-to-b from-[var(--dark-bg)] to-[var(--dark-surface)]">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
             <h2 className="text-4xl sm:text-5xl font-bold mb-4" style={{ color: 'var(--gold-primary)' }}>
-              Advanced Technology
+              Why Choose Erebus?
             </h2>
             <p className="text-gray-400 text-lg max-w-3xl mx-auto">
-              Built with proven cryptographic techniques and modern blockchain technology. Our protocol ensures transaction privacy and security through mathematical guarantees.
+              Built on cutting-edge cryptography and battle-tested blockchain infrastructure
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-            <div className="tech-item flex items-start gap-3 p-4 rounded-lg bg-black/30 border border-[var(--gold-primary)]/10">
-              <div className="text-[var(--gold-primary)] mt-1">✓</div>
-              <p className="text-gray-300">Groth16 ZK-SNARKs with custom Circom circuits</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="why-card group">
+              <div className="why-icon mb-4">
+                <Shield className="h-10 w-10" />
+              </div>
+              <h3 className="text-xl font-bold mb-3 text-[var(--gold-primary)]">Military-Grade Security</h3>
+              <p className="text-gray-400 text-sm leading-relaxed">
+                zk-SNARKs and Pedersen commitments ensure mathematical privacy guarantees
+              </p>
             </div>
-            <div className="tech-item flex items-start gap-3 p-4 rounded-lg bg-black/30 border border-[var(--gold-primary)]/10">
-              <div className="text-[var(--gold-primary)] mt-1">✓</div>
-              <p className="text-gray-300">Pedersen commitment schemes for secure privacy</p>
+
+            <div className="why-card group">
+              <div className="why-icon mb-4">
+                <Zap className="h-10 w-10" />
+              </div>
+              <h3 className="text-xl font-bold mb-3 text-[var(--gold-primary)]">Lightning Fast</h3>
+              <p className="text-gray-400 text-sm leading-relaxed">
+                Powered by Solana's high-performance blockchain with sub-second finality
+              </p>
             </div>
-            <div className="tech-item flex items-start gap-3 p-4 rounded-lg bg-black/30 border border-[var(--gold-primary)]/10">
-              <div className="text-[var(--gold-primary)] mt-1">✓</div>
-              <p className="text-gray-300">Solana smart contracts with robust security</p>
+
+            <div className="why-card group">
+              <div className="why-icon mb-4">
+                <Lock className="h-10 w-10" />
+              </div>
+              <h3 className="text-xl font-bold mb-3 text-[var(--gold-primary)]">True Privacy</h3>
+              <p className="text-gray-400 text-sm leading-relaxed">
+                Zero-knowledge proofs keep your transactions completely confidential
+              </p>
             </div>
-            <div className="tech-item flex items-start gap-3 p-4 rounded-lg bg-black/30 border border-[var(--gold-primary)]/10">
-              <div className="text-[var(--gold-primary)] mt-1">✓</div>
-              <p className="text-gray-300">Cryptographic nullifiers prevent double-spending</p>
+
+            <div className="why-card group">
+              <div className="why-icon mb-4">
+                <ChevronRight className="h-10 w-10" />
+              </div>
+              <h3 className="text-xl font-bold mb-3 text-[var(--gold-primary)]">No KYC Required</h3>
+              <p className="text-gray-400 text-sm leading-relaxed">
+                Start immediately without identity verification or personal information
+              </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Privacy Technology Section */}
-      <section className="py-24 px-6 bg-[var(--dark-bg)]">
-        <div className="max-w-6xl mx-auto">
+      {/* How It Works Section */}
+      <section className="py-24 px-6 bg-[var(--dark-surface)] relative overflow-hidden">
+        <div className="absolute inset-0 opacity-5">
+          <div className="absolute top-0 left-1/4 w-96 h-96 bg-[var(--gold-primary)] rounded-full blur-3xl"></div>
+          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[var(--gold-primary)] rounded-full blur-3xl"></div>
+        </div>
+        
+        <div className="max-w-6xl mx-auto relative z-10">
           <div className="text-center mb-16">
             <h2 className="text-4xl sm:text-5xl font-bold mb-4" style={{ color: 'var(--gold-primary)' }}>
-              Privacy Technology
+              How It Works
             </h2>
-            <p className="text-gray-400 text-lg">Modern Cryptography for Secure Transactions</p>
+            <p className="text-gray-400 text-lg">Three simple steps to complete privacy</p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-            <div className="space-y-6">
-              <h3 className="text-2xl font-bold text-[var(--gold-primary)]">Pedersen Commitments</h3>
-              <p className="text-gray-400 leading-relaxed">
-                Secure value commitment using elliptic curve cryptography. Each commitment (vG + rH) provides cryptographic hiding and binding properties to ensure transaction privacy.
-              </p>
-              <div className="code-block bg-black/50 border border-[var(--gold-primary)]/20 rounded-lg p-6 font-mono text-sm">
-                <pre className="text-gray-300 overflow-x-auto">
-{`// Privacy Commitment
-commitment = value * Generator + random * Blinder
-
-// Generate Proof
-zk_proof = generate_proof(
-  claim: "Value is committed correctly",
-  private: { value, randomness },
-  public: { commitment }
-)
-
-// Nullifier Hash
-nullifier = hash(secret, commitment)`}
-                </pre>
+          <div className="space-y-12">
+            <div className="how-card flex flex-col md:flex-row items-center gap-8">
+              <div className="step-number-modern">01</div>
+              <div className="flex-1">
+                <h3 className="text-2xl font-bold mb-3 text-[var(--gold-primary)]">Connect Your Wallet</h3>
+                <p className="text-gray-400 leading-relaxed">
+                  Use any Solana wallet like Phantom or Solflare. No registration, no personal information required. Your privacy starts here.
+                </p>
+              </div>
+              <div className="hidden lg:block w-32 h-32 rounded-full bg-gradient-to-br from-[var(--gold-primary)]/20 to-transparent border border-[var(--gold-primary)]/30 flex items-center justify-center">
+                <Shield className="h-16 w-16 text-[var(--gold-primary)]" />
               </div>
             </div>
 
-            <div className="space-y-6">
-              <h3 className="text-2xl font-bold text-[var(--gold-primary)]">Zero-Knowledge Proofs</h3>
-              <p className="text-gray-400 leading-relaxed">
-                zk-SNARKs enable privacy-preserving verification. Prove transaction validity, amounts, and ownership while revealing no sensitive information.
-              </p>
-              <div className="code-block bg-black/50 border border-[var(--gold-primary)]/20 rounded-lg p-6 font-mono text-sm">
-                <pre className="text-gray-300 overflow-x-auto">
-{`// Shadow Circuit (Circom)
-template ErebusTransfer() {
-  signal private wealth;
-  signal private erebus_key;
-  signal private shadow_seed;
-  signal output dark_seal;
+            <div className="how-card flex flex-col md:flex-row-reverse items-center gap-8">
+              <div className="step-number-modern">02</div>
+              <div className="flex-1">
+                <h3 className="text-2xl font-bold mb-3 text-[var(--gold-primary)]">Deposit & Shield</h3>
+                <p className="text-gray-400 leading-relaxed">
+                  Send your assets into the Erebus protocol. Advanced cryptography shields your transaction from prying eyes, creating an unbreakable privacy layer.
+                </p>
+              </div>
+              <div className="hidden lg:block w-32 h-32 rounded-full bg-gradient-to-br from-[var(--gold-primary)]/20 to-transparent border border-[var(--gold-primary)]/30 flex items-center justify-center">
+                <Lock className="h-16 w-16 text-[var(--gold-primary)]" />
+              </div>
+            </div>
 
-  dark_seal <== Pedersen([wealth, shadow_seed]);
-  verify(erebus_key, dark_seal);
-}`}
-                </pre>
+            <div className="how-card flex flex-col md:flex-row items-center gap-8">
+              <div className="step-number-modern">03</div>
+              <div className="flex-1">
+                <h3 className="text-2xl font-bold mb-3 text-[var(--gold-primary)]">Trade & Transfer Privately</h3>
+                <p className="text-gray-400 leading-relaxed">
+                  Swap tokens, transfer funds, or bridge assets - all with complete privacy. Your financial activity remains your secret.
+                </p>
+              </div>
+              <div className="hidden lg:block w-32 h-32 rounded-full bg-gradient-to-br from-[var(--gold-primary)]/20 to-transparent border border-[var(--gold-primary)]/30 flex items-center justify-center">
+                <Zap className="h-16 w-16 text-[var(--gold-primary)]" />
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* The Ritual Section */}
-      <section id="ritual" className="py-24 px-6 bg-[var(--dark-surface)]">
+      {/* Stats & Numbers Section */}
+      <section className="py-24 px-6 bg-gradient-to-b from-[var(--dark-surface)] to-[var(--dark-bg)]">
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl sm:text-5xl font-bold mb-4" style={{ color: 'var(--gold-primary)' }}>
-              The Ritual
-            </h2>
-            <p className="text-gray-400 text-lg">Three steps into eternal darkness</p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="ritual-card text-center">
-              <div className="text-6xl font-bold text-[var(--gold-primary)] mb-6">I</div>
-              <h3 className="text-2xl font-bold mb-4 text-[var(--gold-primary)]">Descent</h3>
-              <p className="text-gray-400 leading-relaxed">
-                Cast your wealth into the void. The underworld accepts your offering, binding it with cryptographic seals known only to shadows.
-              </p>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            <div className="stats-modern text-center">
+              <div className="text-5xl font-bold text-[var(--gold-primary)] mb-2">100%</div>
+              <div className="text-gray-400">Private</div>
             </div>
-
-            <div className="ritual-card text-center">
-              <div className="text-6xl font-bold text-[var(--gold-primary)] mb-6">II</div>
-              <h3 className="text-2xl font-bold mb-4 text-[var(--gold-primary)]">Oblivion</h3>
-              <p className="text-gray-400 leading-relaxed">
-                Your wealth dissolves into darkness, mixing with countless others. All traces vanish. Even the gods cannot find what Erebus conceals.
-              </p>
+            <div className="stats-modern text-center">
+              <div className="text-5xl font-bold text-[var(--gold-primary)] mb-2">&lt;1s</div>
+              <div className="text-gray-400">Transaction Time</div>
             </div>
-
-            <div className="ritual-card text-center">
-              <div className="text-6xl font-bold text-[var(--gold-primary)] mb-6">III</div>
-              <h3 className="text-2xl font-bold mb-4 text-[var(--gold-primary)]">Resurrection</h3>
-              <p className="text-gray-400 leading-relaxed">
-                Speak the incantation. Prove your shadow claim. Wealth emerges from darkness to any destination, reborn without memory of origin.
-              </p>
+            <div className="stats-modern text-center">
+              <div className="text-5xl font-bold text-[var(--gold-primary)] mb-2">$0.01</div>
+              <div className="text-gray-400">Average Fee</div>
+            </div>
+            <div className="stats-modern text-center">
+              <div className="text-5xl font-bold text-[var(--gold-primary)] mb-2">24/7</div>
+              <div className="text-gray-400">Available</div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-24 px-6 bg-[var(--dark-bg)]">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl sm:text-5xl font-bold mb-6" style={{ color: 'var(--gold-primary)' }}>
-            Start Using Erebus
+      {/* Final CTA Section */}
+      <section className="py-32 px-6 bg-gradient-to-b from-[var(--dark-bg)] via-[var(--dark-surface)] to-black relative overflow-hidden">
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[var(--gold-primary)] rounded-full blur-3xl"></div>
+        </div>
+        
+        <div className="max-w-4xl mx-auto text-center relative z-10">
+          <h2 className="text-5xl sm:text-6xl font-bold mb-6" style={{ color: 'var(--gold-primary)' }}>
+            Enter the Underworld
           </h2>
-          <p className="text-gray-400 text-lg mb-8">
-            Experience secure and private transactions today
+          <p className="text-gray-300 text-xl mb-12 leading-relaxed max-w-2xl mx-auto">
+            Join the revolution of truly private DeFi. Your transactions, your privacy, your control.
           </p>
-          <Button
-            onClick={() => connected ? navigate('/dashboard') : document.querySelector('.wallet-adapter-button')?.click()}
-            className="bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-black hover:from-[#FFD700] hover:to-[#D4AF37] px-12 py-6 text-lg font-semibold rounded-full shadow-[0_0_30px_rgba(255,215,0,0.4)] hover:shadow-[0_0_40px_rgba(255,215,0,0.6)] transition-all duration-300"
-          >
-            Launch App <ChevronRight className="ml-2 h-5 w-5 inline" />
-          </Button>
-          <p className="text-gray-500 text-sm mt-6">
-            No KYC required • Decentralized • Privacy-focused
-          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
+            <Button
+              onClick={() => connected ? navigate('/dashboard') : document.querySelector('.wallet-adapter-button')?.click()}
+              className="cta-button-modern text-xl px-12 py-7"
+            >
+              Launch Application
+              <ChevronRight className="ml-2 h-6 w-6 inline" />
+            </Button>
+          </div>
+          <div className="flex items-center justify-center gap-8 text-sm text-gray-500">
+            <span className="flex items-center gap-2">
+              <Shield className="h-4 w-4" /> No KYC
+            </span>
+            <span className="flex items-center gap-2">
+              <Lock className="h-4 w-4" /> Fully Private
+            </span>
+            <span className="flex items-center gap-2">
+              <Zap className="h-4 w-4" /> Instant
+            </span>
+          </div>
         </div>
       </section>
+
+      {/* Footer */}
+      <footer className="py-12 px-6 bg-black border-t border-[var(--gold-primary)]/20">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+            <div className="flex items-center gap-3">
+              <img 
+                src="https://customer-assets.emergentagent.com/job_ed48b7a2-6a38-4200-8e89-4581c421d9ea/artifacts/q9tyi3wm_erebus-icon.svg" 
+                alt="Erebus" 
+                className="h-8 w-8"
+              />
+              <span className="text-[var(--gold-primary)] font-semibold">Erebus Protocol</span>
+            </div>
+            <div className="text-gray-500 text-sm">
+              © 2025 Erebus Protocol. Privacy by design.
+            </div>
+            <div className="flex gap-6">
+              <a href="#" className="text-gray-500 hover:text-[var(--gold-primary)] transition-colors">
+                <Twitter className="h-5 w-5" />
+              </a>
+              <a href="#" className="text-gray-500 hover:text-[var(--gold-primary)] transition-colors">
+                <Github className="h-5 w-5" />
+              </a>
+            </div>
+          </div>
+        </div>
+      </footer>
 
       <footer className="py-12 px-6 border-t border-[var(--dark-border)]">
         <div className="max-w-6xl mx-auto">
