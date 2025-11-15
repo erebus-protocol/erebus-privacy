@@ -6,6 +6,7 @@ import { Shield, Lock, Zap, ArrowRight, Github, Twitter, Sparkles, ChevronRight 
 import { Button } from '../components/ui/button';
 import Lottie from 'lottie-react';
 import secureLockAnimation from '../assets/secure-lock.json';
+import bitcoinExchangeAnimation from '../assets/bitcoin-exchange.json';
 
 const LandingPage = () => {
   const navigate = useNavigate();
