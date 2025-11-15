@@ -43,14 +43,12 @@ const LandingPage = () => {
             {connected && (
               <Button
                 onClick={() => navigate('/dashboard')}
-                variant="outline"
-                className="border-[var(--gold-primary)] text-[var(--gold-primary)] hover:bg-[var(--gold-primary)] hover:text-black"
+                className="bg-gradient-to-r from-[var(--gold-primary)] to-[var(--gold-secondary)] text-black font-semibold hover:opacity-90 px-6"
                 data-testid="dashboard-nav-btn"
               >
                 Dashboard
               </Button>
             )}
-            <WalletMultiButton data-testid="wallet-connect-btn" />
           </div>
         </div>
       </nav>
