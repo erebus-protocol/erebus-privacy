@@ -1,44 +1,12 @@
-import { useEffect, useRef } from 'react';
+import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
-import { Network } from 'lucide-react';
+import { Network, ExternalLink } from 'lucide-react';
+import { Button } from './ui/button';
 
 const BridgeComponent = () => {
-  const wormholeRef = useRef(null);
-
-  useEffect(() => {
-    if (wormholeRef.current && !wormholeRef.current.hasChildNodes()) {
-      const script = document.createElement('script');
-      script.src = 'https://www.unpkg.com/@wormhole-foundation/wormhole-connect@0.3.3/dist/main.js';
-      script.async = true;
-      document.body.appendChild(script);
-
-      script.onload = () => {
-        if (window.WormholeConnect && wormholeRef.current) {
-          window.WormholeConnect.default({
-            target: wormholeRef.current,
-            config: {
-              env: 'mainnet',
-              networks: ['solana', 'ethereum', 'polygon', 'avalanche', 'bsc'],
-              tokens: ['SOL', 'ETH', 'USDC', 'USDT'],
-              mode: 'dark',
-              customTheme: {
-                primary: '#FFD700',
-                secondary: '#FFA500',
-                background: '#1a1a1a',
-                text: '#ffffff'
-              }
-            }
-          });
-        }
-      };
-
-      return () => {
-        if (script.parentNode) {
-          script.parentNode.removeChild(script);
-        }
-      };
-    }
-  }, []);
+  const openWormholeBridge = () => {
+    window.open('https://www.portalbridge.com/#/transfer', '_blank');
+  };
 
   return (
     <Card className="bg-[var(--dark-surface)] border-[var(--dark-border)]" data-testid="bridge-card">
@@ -48,28 +16,50 @@ const BridgeComponent = () => {
           Cross-Chain Bridge
         </CardTitle>
         <CardDescription className="text-gray-400">
-          Bridge assets across chains using Wormhole
+          Bridge assets across chains using Wormhole Portal
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div 
-          ref={wormholeRef} 
-          id="wormhole-connect" 
-          className="min-h-[500px] rounded-lg"
-          data-testid="wormhole-widget"
-        >
-          <div className="flex items-center justify-center h-[500px]">
-            <div className="text-center space-y-4">
-              <Network className="h-16 w-16 mx-auto text-[var(--gold-primary)] animate-pulse" />
-              <p className="text-gray-400">Loading Wormhole Bridge...</p>
-              <p className="text-xs text-gray-500">If the widget doesn't load, please refresh the page</p>
+        <div className="flex flex-col items-center justify-center h-[500px] space-y-8" data-testid="wormhole-widget">
+          <div className="text-center space-y-6">
+            <div className="relative">
+              <div className="absolute inset-0 bg-[var(--gold-primary)] blur-3xl opacity-20"></div>
+              <Network className="relative h-32 w-32 mx-auto text-[var(--gold-primary)]" />
             </div>
+            
+            <div className="space-y-4">
+              <h3 className="text-2xl font-bold text-white">Wormhole Bridge Integration</h3>
+              <p className="text-gray-400 max-w-md mx-auto">
+                Bridge tokens between Solana and other EVM chains securely through Wormhole Portal
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4 max-w-md mx-auto text-sm">
+              <div className="p-4 bg-[var(--dark-bg)] rounded-lg border border-[var(--dark-border)]">
+                <p className="text-[var(--gold-primary)] font-semibold mb-1">Supported Chains</p>
+                <p className="text-gray-500">Ethereum, BSC, Polygon, Avalanche, and more</p>
+              </div>
+              <div className="p-4 bg-[var(--dark-bg)] rounded-lg border border-[var(--dark-border)]">
+                <p className="text-[var(--gold-primary)] font-semibold mb-1">Supported Tokens</p>
+                <p className="text-gray-500">SOL, ETH, USDC, USDT, and more</p>
+              </div>
+            </div>
+
+            <Button
+              onClick={openWormholeBridge}
+              className="bg-gradient-to-r from-[var(--gold-primary)] to-[var(--gold-secondary)] text-black font-semibold hover:opacity-90"
+              size="lg"
+              data-testid="open-wormhole-btn"
+            >
+              Open Wormhole Portal
+              <ExternalLink className="ml-2 h-4 w-4" />
+            </Button>
           </div>
         </div>
 
         <div className="mt-6 p-4 bg-[var(--dark-bg)] rounded-lg border border-[var(--dark-border)]">
           <p className="text-xs text-gray-400">
-            🌉 Bridge tokens between Solana and other chains privately.
+            🌉 Bridge tokens between Solana and other chains privately through Wormhole's trusted infrastructure.
           </p>
         </div>
       </CardContent>
