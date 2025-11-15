@@ -118,17 +118,21 @@ async def get_balance(address: str):
 
 @api_router.get("/token-list")
 async def get_token_list():
-    """Get verified token list from Jupiter"""
-    try:
-        async with httpx.AsyncClient() as client:
-            response = await client.get("https://tokens.jup.ag/tokens?tags=verified")
-            if response.status_code == 200:
-                return response.json()
-            else:
-                raise HTTPException(status_code=response.status_code, detail="Failed to fetch token list")
-    except Exception as e:
-        logging.error(f"Token list error: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Error fetching token list: {str(e)}")
+    """Get popular token list"""
+    # Popular tokens with verified data
+    popular_tokens = [
+        {"address": "So11111111111111111111111111111111111111112", "symbol": "SOL", "name": "Wrapped SOL", "decimals": 9, "logoURI": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/So11111111111111111111111111111111111111112/logo.png", "tags": ["verified"]},
+        {"address": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v", "symbol": "USDC", "name": "USD Coin", "decimals": 6, "logoURI": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v/logo.png", "tags": ["verified", "stablecoin"]},
+        {"address": "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB", "symbol": "USDT", "name": "USDT", "decimals": 6, "logoURI": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB/logo.png", "tags": ["verified", "stablecoin"]},
+        {"address": "7vfCXTUXx5WJV5JADk17DUJ4ksgau7utNKj4b963voxs", "symbol": "ETH", "name": "Ether (Portal)", "decimals": 8, "logoURI": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/7vfCXTUXx5WJV5JADk17DUJ4ksgau7utNKj4b963voxs/logo.png", "tags": ["verified"]},
+        {"address": "mSoLzYCxHdYgdzU16g5QSh3i5K3z3KZK7ytfqcJm7So", "symbol": "mSOL", "name": "Marinade staked SOL", "decimals": 9, "logoURI": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/mSoLzYCxHdYgdzU16g5QSh3i5K3z3KZK7ytfqcJm7So/logo.png", "tags": ["verified"]},
+        {"address": "7dHbWXmci3dT8UFYWYZweBLXgycu7Y3iL6trKn1Y7ARj", "symbol": "stSOL", "name": "Lido Staked SOL", "decimals": 9, "logoURI": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/7dHbWXmci3dT8UFYWYZweBLXgycu7Y3iL6trKn1Y7ARj/logo.png", "tags": ["verified"]},
+        {"address": "J1toso1uCk3RLmjorhTtrVwY9HJ7X8V9yYac6Y7kGCPn", "symbol": "JitoSOL", "name": "Jito Staked SOL", "decimals": 9, "logoURI": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/J1toso1uCk3RLmjorhTtrVwY9HJ7X8V9yYac6Y7kGCPn/logo.png", "tags": ["verified"]},
+        {"address": "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263", "symbol": "BONK", "name": "Bonk", "decimals": 5, "logoURI": "https://arweave.net/hQiPZOsRZXGXBJd_82PhVdlM_hACsT_q6wqwf5cSY7I", "tags": ["verified"]},
+        {"address": "7GCihgDB8fe6KNjn2MYtkzZcRjQy3t9GHdC8uHYmW2hr", "symbol": "POPCAT", "name": "Popcat", "decimals": 9, "logoURI": "https://bafkreibk3covs5ltyqxa272uodhculbr6kea6betidfwy3ajsav2vjzyum.ipfs.nftstorage.link", "tags": ["verified"]},
+        {"address": "HZ1JovNiVvGrGNiiYvEozEVgZ58xaU3RKwX8eACQBCt3", "symbol": "PYTH", "name": "Pyth Network", "decimals": 6, "logoURI": "https://pyth.network/token.svg", "tags": ["verified"]},
+    ]
+    return popular_tokens
 
 @api_router.post("/swap/quote")
 async def get_swap_quote(request: SwapQuoteRequest):
