@@ -87,9 +87,10 @@ const LandingPage = () => {
             color: 'var(--gold-primary)',
             fontFamily: 'Georgia, "Times New Roman", serif',
             textShadow: '0 0 30px rgba(255, 215, 0, 0.5)',
-            letterSpacing: '0.05em'
+            letterSpacing: '0.05em',
+            marginTop: '100px'
           }}>
-            The Underworld<br />of Privacy
+            THE UNDERWORLD<br />OF PRIVACY
           </h1>
           
           <p className="text-base sm:text-lg lg:text-xl mb-12 text-gray-300 max-w-3xl mx-auto font-light leading-relaxed">
