@@ -34,7 +34,9 @@ const webpackConfig = {
     alias: {
       '@': path.resolve(__dirname, 'src'),
     },
-    configure: (webpackConfig) => {
+    configure: (webpackConfig, { env, paths }) => {
+      // Disable all source maps
+      webpackConfig.devtool = false;
       // Add polyfills for Node.js modules
       webpackConfig.resolve.fallback = {
         ...webpackConfig.resolve.fallback,
