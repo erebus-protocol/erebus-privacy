@@ -41,7 +41,7 @@ const webpackConfig = {
         crypto: require.resolve('crypto-browserify'),
         stream: require.resolve('stream-browserify'),
         buffer: require.resolve('buffer'),
-        process: require.resolve('process/browser'),
+        process: require.resolve('process'),
         assert: require.resolve('assert'),
         url: require.resolve('url'),
         https: require.resolve('https-browserify'),
@@ -51,6 +51,7 @@ const webpackConfig = {
         vm: false,
         fs: false,
         path: false,
+        zlib: false,
       };
 
       // Provide global Buffer and process
