@@ -83,10 +83,8 @@ const LandingPage = () => {
         </div>
 
         <div className="relative z-10 max-w-6xl mx-auto px-6 text-center">
-          <h1 className="hero-headline text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold mb-6 tracking-wider leading-tight" style={{ 
-            color: 'var(--gold-primary)',
+          <h1 className="hero-headline hero-headline-shine text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold mb-6 tracking-wider leading-tight" style={{ 
             fontFamily: 'Georgia, "Times New Roman", serif',
-            textShadow: '0 0 30px rgba(255, 215, 0, 0.5)',
             letterSpacing: '0.05em',
             marginTop: '100px'
           }}>
