@@ -65,13 +65,23 @@ const webpackConfig = {
       };
 
       // Completely disable source-map-loader to avoid ENOENT errors
-      webpackConfig.module.rules = webpackConfig.module.rules.filter(rule => {
-        // Remove source-map-loader completely
-        if (rule.enforce === 'pre' && rule.loader && rule.loader.includes('source-map-loader')) {
-          return false;
+      webpackConfig.module.rules = webpackConfig.module.rules.map(rule => {
+        // Check if rule has oneOf (common in CRA configs)
+        if (rule.oneOf) {
+          rule.oneOf = rule.oneOf.filter(oneOfRule => {
+            if (oneOfRule.loader && oneOfRule.loader.includes('source-map-loader')) {
+              return false;
+            }
+            return true;
+          });
         }
-        return true;
-      });
+        
+        // Remove source-map-loader completely
+        if (rule.enforce === 'pre' || (rule.loader && rule.loader.includes('source-map-loader'))) {
+          return null;
+        }
+        return rule;
+      }).filter(Boolean);
 
       // Add rule to handle .mjs files
       webpackConfig.module.rules.push({
