@@ -82,6 +82,35 @@ h1, h2, h3, h4, h5, h6 {
   background: linear-gradient(135deg, var(--gold-secondary), var(--gold-accent)) !important;
 }
 
+/* Wallet List Items - Black Background */
+.wallet-adapter-modal-list .wallet-adapter-button {
+  background: #000000 !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  margin-bottom: 8px !important;
+}
+
+.wallet-adapter-modal-list .wallet-adapter-button:hover {
+  background: #1a1a1a !important;
+  border-color: var(--gold-accent) !important;
+  transform: none !important;
+}
+
+.wallet-adapter-modal-list .wallet-adapter-button:not([disabled]):hover {
+  background: #1a1a1a !important;
+}
+
+/* Wallet button text color */
+.wallet-adapter-modal-list .wallet-adapter-button-start-icon,
+.wallet-adapter-modal-list .wallet-adapter-button-end-icon {
+  filter: brightness(1) !important;
+}
+
+.wallet-adapter-modal-list li button {
+  background: #000000 !important;
+  color: #ffffff !important;
+}
+
 /* Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
