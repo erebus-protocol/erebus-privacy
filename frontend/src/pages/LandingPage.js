@@ -52,7 +52,12 @@ const LandingPage = () => {
           <div className="flex items-center gap-6">
             <a href="#home" className="text-sm hover:text-[var(--gold-primary)] transition-colors">HOME</a>
             <a href="#features" className="text-sm hover:text-[var(--gold-primary)] transition-colors">FEATURES</a>
-            <a href="#docs" className="text-sm hover:text-[var(--gold-primary)] transition-colors">DOCS</a>
+            <button 
+              onClick={() => navigate('/docs')}
+              className="text-sm hover:text-[var(--gold-primary)] transition-colors"
+            >
+              DOCS
+            </button>
             {connected && (
               <Button
                 onClick={() => navigate('/dashboard')}
