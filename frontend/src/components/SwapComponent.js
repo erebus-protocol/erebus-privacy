@@ -63,13 +63,22 @@ const SwapComponent = () => {
 
   const fetchBalances = async () => {
     try {
+      // Fetch FROM token balance
       if (fromToken.symbol === 'SOL') {
         const bal = await connection.getBalance(publicKey);
         setFromBalance(bal / LAMPORTS_PER_SOL);
+      } else {
+        const response = await axios.get(`${API}/token-balance/${publicKey.toBase58()}/${fromToken.address}`);
+        setFromBalance(response.data.balance || 0);
       }
+      
+      // Fetch TO token balance
       if (toToken.symbol === 'SOL') {
         const bal = await connection.getBalance(publicKey);
         setToBalance(bal / LAMPORTS_PER_SOL);
+      } else {
+        const response = await axios.get(`${API}/token-balance/${publicKey.toBase58()}/${toToken.address}`);
+        setToBalance(response.data.balance || 0);
       }
     } catch (error) {
       console.error('Balance fetch error:', error);
