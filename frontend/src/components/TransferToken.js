@@ -7,7 +7,7 @@ import { Label } from './ui/label';
 import { Loader2, Coins, RefreshCw, ChevronDown } from 'lucide-react';
 import { toast } from 'sonner';
 import { PublicKey, Transaction } from '@solana/web3.js';
-import { getAssociatedTokenAddress, createTransferInstruction } from '@solana/spl-token';
+import { getAssociatedTokenAddress, createTransferInstruction, TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import axios from 'axios';
 import { ScrollArea } from './ui/scroll-area';
 
