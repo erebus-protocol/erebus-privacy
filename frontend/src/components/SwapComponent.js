@@ -92,12 +92,12 @@ const SwapComponent = () => {
   const getTokenBalance = async (mintAddress, decimals) => {
     try {
       const { PublicKey } = await import('@solana/web3.js');
-      const { TOKEN_PROGRAM_ID } = await import('@solana/spl-token');
+      const { TOKEN_PROGRAM_ID, AccountLayout } = await import('@solana/spl-token');
       
       const mintPublicKey = new PublicKey(mintAddress);
       
       // Get all token accounts for this wallet
-      const tokenAccounts = await connection.getTokenAccountsByOwner(
+      const tokenAccounts = await connection.getParsedTokenAccountsByOwner(
         publicKey,
         { mint: mintPublicKey }
       );
@@ -106,18 +106,13 @@ const SwapComponent = () => {
         return 0; // No token account found
       }
 
-      // Parse account data to get balance
+      // Get balance from parsed account info
       const accountInfo = tokenAccounts.value[0];
-      const accountData = accountInfo.account.data;
+      const parsedInfo = accountInfo.account.data.parsed.info;
+      const tokenAmount = parsedInfo.tokenAmount;
       
-      // Token account data layout: amount is at bytes 64-72 (u64 little-endian)
-      const amountBuffer = accountData.slice(64, 72);
-      const amount = Buffer.from(amountBuffer).readBigUInt64LE(0);
-      
-      // Convert to UI amount using decimals
-      const balance = Number(amount) / Math.pow(10, decimals);
-      
-      return balance;
+      // Return UI amount (already converted with decimals)
+      return parseFloat(tokenAmount.uiAmount || 0);
       
     } catch (error) {
       console.error(`Error fetching balance for ${mintAddress}:`, error);
