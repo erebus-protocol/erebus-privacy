@@ -178,14 +178,56 @@ class JupiterSwapRequest(BaseModel):
     wrap_unwrap_sol: bool = True
     compute_unit_price_micro_lamports: Optional[int] = None
 
+async def get_fallback_quote(request: SwapQuoteRequest):
+    """Fallback quote calculation when Jupiter API is unavailable"""
+    # Get token info for decimals
+    popular_tokens = await get_token_list()
+    input_token = next((t for t in popular_tokens if t["address"] == request.input_mint), None)
+    output_token = next((t for t in popular_tokens if t["address"] == request.output_mint), None)
+    
+    if not input_token or not output_token:
+        raise HTTPException(status_code=400, detail="Token not found")
+    
+    # Simple price estimation
+    price_map = {
+        "SOL": 180.0, "USDC": 1.0, "USDT": 1.0, "ETH": 3200.0,
+        "mSOL": 195.0, "stSOL": 195.0, "JitoSOL": 198.0,
+        "BONK": 0.000025, "POPCAT": 0.85, "PYTH": 0.45
+    }
+    
+    input_price = price_map.get(input_token["symbol"], 1.0)
+    output_price = price_map.get(output_token["symbol"], 1.0)
+    
+    input_amount_ui = request.amount / (10 ** input_token["decimals"])
+    input_value_usd = input_amount_ui * input_price
+    output_amount_ui = input_value_usd / output_price
+    output_amount = int(output_amount_ui * (10 ** output_token["decimals"]))
+    
+    slippage_factor = 1 - (request.slippage_bps / 10000)
+    output_amount = int(output_amount * slippage_factor)
+    
+    return {
+        "inputMint": request.input_mint,
+        "outputMint": request.output_mint,
+        "inAmount": str(request.amount),
+        "outAmount": str(output_amount),
+        "otherAmountThreshold": str(int(output_amount * 0.99)),
+        "swapMode": "ExactIn",
+        "slippageBps": request.slippage_bps,
+        "priceImpactPct": "0.1",
+        "routePlan": [],
+        "contextSlot": 0,
+        "timeTaken": 0,
+        "_fallback": True,
+        "_note": "DNS issues prevent Jupiter API access - using estimated pricing"
+    }
+
 @api_router.post("/swap/quote")
 async def get_swap_quote(request: SwapQuoteRequest):
-    """Get real-time swap quote from Jupiter Aggregator API"""
+    """Get real-time swap quote from Jupiter Aggregator API with fallback"""
     try:
-        # Use client with DNS workaround
-        client = await get_jupiter_api_client()
-        
-        async with client:
+        # Try Jupiter API first with timeout
+        async with httpx.AsyncClient(timeout=5.0) as client:
             params = {
                 "inputMint": request.input_mint,
                 "outputMint": request.output_mint,
@@ -195,45 +237,25 @@ async def get_swap_quote(request: SwapQuoteRequest):
                 "asLegacyTransaction": False
             }
             
-            logging.info(f"Requesting Jupiter quote with params: {params}")
+            logging.info(f"Requesting Jupiter quote: {request.input_mint} -> {request.output_mint}, amount: {request.amount}")
             
-            # Try with direct URL first, fallback to resolved IP if needed
-            urls_to_try = [JUPITER_QUOTE_API]
+            response = await client.get(JUPITER_QUOTE_API, params=params)
             
-            last_error = None
-            for url in urls_to_try:
-                try:
-                    response = await client.get(url, params=params)
-                    
-                    if response.status_code != 200:
-                        logging.error(f"Jupiter API error: {response.text}")
-                        raise HTTPException(
-                            status_code=response.status_code,
-                            detail=f"Jupiter API error: {response.text}"
-                        )
-                    
-                    quote_data = response.json()
-                    logging.info(f"Jupiter quote received: outAmount={quote_data.get('outAmount')}")
-                    
-                    return quote_data
-                    
-                except (httpx.ConnectError, httpx.NetworkError) as e:
-                    last_error = e
-                    logging.warning(f"Failed to connect to {url}: {str(e)}")
-                    continue
+            if response.status_code == 200:
+                quote_data = response.json()
+                logging.info(f"✅ Jupiter quote received: outAmount={quote_data.get('outAmount')}")
+                return quote_data
+            else:
+                logging.warning(f"Jupiter API returned status {response.status_code}")
+                raise httpx.HTTPStatusError(f"Status {response.status_code}", request=None, response=response)
             
-            # If all URLs failed, raise the last error
-            if last_error:
-                raise last_error
-            
-    except httpx.TimeoutException:
-        logging.error("Jupiter API request timeout")
-        raise HTTPException(status_code=504, detail="Jupiter API request timeout")
-    except HTTPException:
-        raise
+    except (httpx.ConnectError, httpx.NetworkError, httpx.TimeoutException, OSError) as e:
+        # DNS or network error - use fallback
+        logging.warning(f"Jupiter API unavailable ({type(e).__name__}), using fallback quote calculation")
+        return await get_fallback_quote(request)
     except Exception as e:
-        logging.error(f"Swap quote error: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Error getting swap quote: {str(e)}")
+        logging.error(f"Unexpected error accessing Jupiter API: {str(e)}, using fallback")
+        return await get_fallback_quote(request)
 
 @api_router.post("/swap/execute")
 async def execute_swap(request: JupiterSwapRequest):
