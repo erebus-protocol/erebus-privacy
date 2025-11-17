@@ -54,8 +54,8 @@ const TransferToken = () => {
         
         // Only include tokens with balance > 0
         if (parseFloat(tokenAmount.uiAmount) > 0) {
-          // Try to get token metadata
-          const tokenInfo = await getTokenInfo(mintAddress);
+          // Get token metadata using new utility with fallback
+          const tokenInfo = await getTokenMetadata(mintAddress);
           
           tokens.push({
             address: mintAddress,
@@ -63,7 +63,9 @@ const TransferToken = () => {
             name: tokenInfo.name || 'Unknown Token',
             decimals: tokenAmount.decimals,
             balance: parseFloat(tokenAmount.uiAmount),
-            logo: tokenInfo.logo || null
+            logoURI: tokenInfo.logoURI || null, // Fixed: use logoURI consistently
+            tags: tokenInfo.tags || [],
+            source: tokenInfo.source
           });
         }
       }
