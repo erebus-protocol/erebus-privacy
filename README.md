@@ -9,17 +9,17 @@
 
 ## 📖 Overview
 
-**Erebus Protocol** adalah aplikasi privacy-focused untuk Solana blockchain yang memungkinkan pengguna melakukan transfer SOL dan SPL tokens dengan privasi tambahan melalui mekanisme treasury wallet. Dengan menggunakan konsep zero-knowledge privacy, protokol ini memutus on-chain link antara pengirim dan penerima.
+**Erebus Protocol** is a privacy-focused application for the Solana blockchain that enables users to perform SOL and SPL token transfers with enhanced privacy through a treasury wallet mechanism. Using zero-knowledge privacy concepts, this protocol breaks the on-chain link between sender and receiver.
 
 ### 🎯 Key Features
 
-- **🔐 Private SOL Transfers** - Transfer SOL melalui treasury wallet dengan fee 0.5%
-- **🪙 Private Token Transfers** - Transfer SPL tokens dengan privasi penuh
-- **💱 Token Swap Integration** - Jupiter Aggregator untuk best swap rates
-- **📊 Token Metadata** - Multi-source metadata dengan fallback (Jupiter → CryptoAPIs → On-chain)
-- **💰 Real-time Balances** - Live balance tracking untuk SOL dan tokens
-- **🎨 Modern UI/UX** - Dark theme dengan gold accents, Lottie animations
-- **📱 Wallet Integration** - Support untuk Phantom, Solflare, dan wallet lainnya
+- **🔐 Private SOL Transfers** - Transfer SOL through treasury wallet with 0.5% fee
+- **🪙 Private Token Transfers** - Transfer SPL tokens with full privacy
+- **💱 Token Swap Integration** - Jupiter Aggregator for best swap rates
+- **📊 Token Metadata** - Multi-source metadata with fallback (Jupiter → CryptoAPIs → On-chain)
+- **💰 Real-time Balances** - Live balance tracking for SOL and tokens
+- **🎨 Modern UI/UX** - Dark theme with gold accents, Lottie animations
+- **📱 Wallet Integration** - Support for Phantom, Solflare, and other wallets
 
 ---
 
@@ -37,10 +37,10 @@
 ```
 
 **Process:**
-1. User mengirim **Amount + Fee** ke Treasury wallet
-2. Backend verifikasi pembayaran on-chain
-3. Treasury otomatis meneruskan **Amount** ke destination wallet
-4. User mendapat 2 transaction signatures (payment & destination)
+1. User sends **Amount + Fee** to Treasury wallet
+2. Backend verifies on-chain payment
+3. Treasury automatically forwards **Amount** to destination wallet
+4. User receives 2 transaction signatures (payment & destination)
 
 ### Tech Stack
 
@@ -80,8 +80,8 @@
 
 1. **Clone Repository**
    ```bash
-   git clone https://github.com/yourusername/erebus-protocol.git
-   cd erebus-protocol
+   git clone https://github.com/erebus-protocol/erebus-privacy.git
+   cd erebus-privacy
    ```
 
 2. **Setup Backend**
@@ -247,8 +247,8 @@ python -c "from solders.keypair import Keypair; import base58; kp = Keypair(); p
 - **Step 3:** View both transaction signatures
 
 **Privacy Benefit:**
-- On-chain observer hanya melihat: User → Treasury, Treasury → Destination
-- Link langsung antara user dan destination terputus
+- On-chain observer only sees: User → Treasury, Treasury → Destination
+- Direct link between user and destination is broken
 
 ### 2. Token Metadata System
 
@@ -259,7 +259,7 @@ python -c "from solders.keypair import Keypair; import base58; kp = Keypair(); p
 
 ### 3. Token Swap
 
-Integrated dengan Jupiter Aggregator:
+Integrated with Jupiter Aggregator:
 - Best price aggregation
 - Multiple DEX routing
 - Slippage protection
@@ -299,6 +299,13 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [Jupiter Aggregator](https://jup.ag) - Best swap rates
 - [CryptoAPIs.io](https://cryptoapis.io) - Token metadata service
 - [Phantom Wallet](https://phantom.app) - User-friendly Solana wallet
+
+---
+
+## 📧 Contact & Support
+
+- **GitHub Issues**: For bugs and feature requests
+- **Discussions**: For questions and community support
 
 ---
 
