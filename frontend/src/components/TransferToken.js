@@ -115,11 +115,13 @@ const TransferToken = () => {
         
         const tokenInfo = jupiterTokens.find(t => t.address === mintAddress);
         if (tokenInfo) {
-          return {
+          const tokenData = {
             symbol: tokenInfo.symbol,
             name: tokenInfo.name,
             logo: tokenInfo.logoURI || null
           };
+          tokenMetadataCache[mintAddress] = tokenData;
+          return tokenData;
         }
       } catch (jupiterError) {
         console.log(`Jupiter API error: ${jupiterError.message}`);
