@@ -144,6 +144,18 @@ frontend:
       - working: true
         agent: "main"
         comment: "Updated to use new getTokenMetadata utility. Fixed logoURI vs logo property inconsistency bug. Added fallback UI for missing token logos (gradient circle with first letter). Added 'CryptoAPIs' badge for tokens fetched from that source."
+  
+  - task: "Privacy Protocol - TransferSOL"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/components/TransferSOL.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Complete rewrite dengan true privacy protocol flow. 3-step process: (1) Input amount+address, (2) Pay total+fee to Treasury via wallet, (3) Backend auto-execute treasury→destination. UI shows fee breakdown (0.5% + min 0.001 SOL), step indicators, and both transaction signatures. Integrated dengan backend endpoints /prepare dan /execute."
 
 metadata:
   created_by: "main_agent"
