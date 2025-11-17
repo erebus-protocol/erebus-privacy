@@ -73,6 +73,40 @@ class SwapQuoteRequest(BaseModel):
     amount: int
     slippage_bps: int = 50
 
+class TransferPrepareRequest(BaseModel):
+    from_address: str
+    to_address: str
+    amount: float
+
+class TransferExecuteRequest(BaseModel):
+    transfer_id: str
+    payment_signature: str
+    from_address: str
+
+class TokenTransferPrepareRequest(BaseModel):
+    from_address: str
+    to_address: str
+    token_mint: str
+    amount: float
+    decimals: int = 9
+
+class PendingTransfer(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    from_address: str
+    to_address: str
+    amount: float
+    fee_amount: float
+    total_amount: float
+    token: str = "SOL"
+    token_mint: Optional[str] = None
+    decimals: int = 9
+    status: str = "pending"  # pending, paid, executed, failed
+    payment_signature: Optional[str] = None
+    destination_signature: Optional[str] = None
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    executed_at: Optional[datetime] = None
+
 # Treasury Wallet Management
 def get_or_create_treasury_wallet():
     treasury_key = os.environ.get('TREASURY_PRIVATE_KEY')
