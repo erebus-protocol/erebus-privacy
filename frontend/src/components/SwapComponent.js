@@ -132,37 +132,47 @@ const SwapComponent = () => {
     }
 
     setLoading(true);
-    const toastId = toast.loading('Preparing swap...');
+    const toastId = toast.loading('Fetching best route...');
 
     try {
-      // Step 1: Get quote
+      // Step 1: Get quote from Jupiter API (client-side, bypasses DNS issues)
       const amount = Math.floor(parseFloat(fromAmount) * Math.pow(10, fromToken.decimals));
-      const quoteResponse = await axios.post(`${API}/swap/quote`, {
-        input_mint: fromToken.address,
-        output_mint: toToken.address,
-        amount: amount,
-        slippage_bps: 50
-      });
-
-      const quote = quoteResponse.data;
+      
+      const quoteUrl = `https://quote-api.jup.ag/v6/quote?inputMint=${fromToken.address}&outputMint=${toToken.address}&amount=${amount}&slippageBps=50`;
+      
+      const quoteResponse = await fetch(quoteUrl);
+      
+      if (!quoteResponse.ok) {
+        throw new Error('Failed to get quote from Jupiter');
+      }
+      
+      const quote = await quoteResponse.json();
+      
       toast.loading('Building transaction...', { id: toastId });
 
-      // Check if quote used fallback pricing
-      if (quote._fallback) {
-        throw new Error('Jupiter API is temporarily unavailable. Real swaps cannot be executed with estimated pricing. Please try again later.');
-      }
-
-      // Step 2: Get swap transaction from Jupiter
-      const swapResponse = await axios.post(`${API}/swap/execute`, {
-        quote_response: quote,
-        user_public_key: publicKey.toBase58(),
-        wrap_unwrap_sol: true
+      // Step 2: Get swap transaction from Jupiter API (client-side)
+      const swapResponse = await fetch('https://quote-api.jup.ag/v6/swap', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          quoteResponse: quote,
+          userPublicKey: publicKey.toBase58(),
+          wrapAndUnwrapSol: true,
+          dynamicComputeUnitLimit: true,
+          prioritizationFeeLamports: 'auto'
+        })
       });
 
-      const { swapTransaction } = swapResponse.data;
+      if (!swapResponse.ok) {
+        throw new Error('Failed to build swap transaction');
+      }
+
+      const { swapTransaction } = await swapResponse.json();
       
       if (!swapTransaction) {
-        throw new Error('Failed to build swap transaction');
+        throw new Error('No swap transaction returned');
       }
 
       toast.loading('Please sign the transaction...', { id: toastId });
@@ -172,8 +182,7 @@ const SwapComponent = () => {
       const swapTransactionBuf = Buffer.from(swapTransaction, 'base64');
       const transaction = VersionedTransaction.deserialize(swapTransactionBuf);
 
-      // Sign transaction using wallet adapter
-      const { signTransaction } = await import('@solana/wallet-adapter-react');
+      // Sign transaction using wallet
       const wallet = window.solana;
       
       if (!wallet || !wallet.signTransaction) {
@@ -182,7 +191,7 @@ const SwapComponent = () => {
 
       const signedTransaction = await wallet.signTransaction(transaction);
       
-      toast.loading('Broadcasting transaction...', { id: toastId });
+      toast.loading('Sending transaction...', { id: toastId });
 
       // Step 4: Send transaction
       const rawTransaction = signedTransaction.serialize();
@@ -194,7 +203,12 @@ const SwapComponent = () => {
       toast.loading('Confirming transaction...', { id: toastId });
 
       // Step 5: Wait for confirmation
-      const confirmation = await connection.confirmTransaction(txid, 'confirmed');
+      const latestBlockhash = await connection.getLatestBlockhash();
+      const confirmation = await connection.confirmTransaction({
+        signature: txid,
+        blockhash: latestBlockhash.blockhash,
+        lastValidBlockHeight: latestBlockhash.lastValidBlockHeight
+      }, 'confirmed');
 
       if (confirmation.value.err) {
         throw new Error('Transaction failed');
@@ -222,7 +236,7 @@ const SwapComponent = () => {
 
     } catch (error) {
       console.error('Swap error:', error);
-      const errorMessage = error.response?.data?.detail || error.message || 'Swap failed';
+      const errorMessage = error.message || 'Swap failed. Please try again.';
       toast.error(errorMessage, { id: toastId });
     } finally {
       setLoading(false);
