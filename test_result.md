@@ -153,7 +153,6 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Backend proxy endpoint for CryptoAPIs"
     - "Token metadata utility fallback mechanism"
     - "TransferToken UI with new metadata system"
   stuck_tasks: []
