@@ -137,11 +137,13 @@ const TransferToken = () => {
         
         const tokenInfo = registryData.tokens.find(t => t.address === mintAddress);
         if (tokenInfo) {
-          return {
+          const tokenData = {
             symbol: tokenInfo.symbol,
             name: tokenInfo.name,
             logo: tokenInfo.logoURI || null
           };
+          tokenMetadataCache[mintAddress] = tokenData;
+          return tokenData;
         }
       } catch (registryError) {
         console.log(`Token registry error: ${registryError.message}`);
