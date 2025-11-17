@@ -40,7 +40,7 @@ const TransferToken = () => {
       // Fetch all SPL token accounts for this wallet
       const tokenAccounts = await connection.getParsedTokenAccountsByOwner(
         publicKey,
-        { programId: new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA') }
+        { programId: TOKEN_PROGRAM_ID }
       );
 
       // Parse and format token data
