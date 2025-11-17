@@ -225,7 +225,21 @@ const TransferToken = () => {
               >
                 {selectedToken ? (
                   <div className="flex items-center gap-3">
-                    <img src={selectedToken.logoURI} alt={selectedToken.symbol} className="w-10 h-10 rounded-full" />
+                    {selectedToken.logoURI ? (
+                      <img 
+                        src={selectedToken.logoURI} 
+                        alt={selectedToken.symbol} 
+                        className="w-10 h-10 rounded-full"
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src = 'https://via.placeholder.com/40/FFD700/000000?text=' + selectedToken.symbol.charAt(0);
+                        }}
+                      />
+                    ) : (
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[var(--gold-primary)] to-[var(--gold-secondary)] flex items-center justify-center text-black font-bold">
+                        {selectedToken.symbol.charAt(0)}
+                      </div>
+                    )}
                     <div className="text-left">
                       <div className="font-semibold text-white">{selectedToken.symbol}</div>
                       <div className="text-sm text-gray-400">Balance: {selectedToken.balance.toFixed(6)}</div>
