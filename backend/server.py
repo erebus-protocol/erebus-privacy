@@ -134,73 +134,101 @@ async def get_token_list():
     ]
     return popular_tokens
 
+# Jupiter API Configuration
+JUPITER_QUOTE_API = "https://quote-api.jup.ag/v6/quote"
+JUPITER_SWAP_API = "https://quote-api.jup.ag/v6/swap"
+
+class JupiterSwapRequest(BaseModel):
+    quote_response: dict
+    user_public_key: str
+    wrap_unwrap_sol: bool = True
+    compute_unit_price_micro_lamports: Optional[int] = None
+
 @api_router.post("/swap/quote")
 async def get_swap_quote(request: SwapQuoteRequest):
-    """Get swap quote - simplified calculation using price estimation"""
+    """Get real-time swap quote from Jupiter Aggregator API"""
     try:
-        # For now, use a simple price-based calculation
-        # In production, this should call Jupiter API
-        
-        # Get token info for decimals
-        input_token = None
-        output_token = None
-        
-        # Find tokens in our list
-        popular_tokens = await get_token_list()
-        for token in popular_tokens:
-            if token["address"] == request.input_mint:
-                input_token = token
-            if token["address"] == request.output_mint:
-                output_token = token
-        
-        if not input_token or not output_token:
-            raise HTTPException(status_code=400, detail="Token not found in supported list")
-        
-        # Simple price estimation (this is a placeholder)
-        # In real implementation, fetch actual prices from DEX
-        price_map = {
-            "SOL": 180.0,
-            "USDC": 1.0,
-            "USDT": 1.0,
-            "ETH": 3200.0,
-            "mSOL": 195.0,
-            "stSOL": 195.0,
-            "JitoSOL": 198.0,
-            "BONK": 0.000025,
-            "POPCAT": 0.85,
-            "PYTH": 0.45
-        }
-        
-        input_price = price_map.get(input_token["symbol"], 1.0)
-        output_price = price_map.get(output_token["symbol"], 1.0)
-        
-        # Calculate output amount
-        input_amount_ui = request.amount / (10 ** input_token["decimals"])
-        input_value_usd = input_amount_ui * input_price
-        output_amount_ui = input_value_usd / output_price
-        output_amount = int(output_amount_ui * (10 ** output_token["decimals"]))
-        
-        # Apply slippage
-        slippage_factor = 1 - (request.slippage_bps / 10000)
-        output_amount = int(output_amount * slippage_factor)
-        
-        return {
-            "inputMint": request.input_mint,
-            "outputMint": request.output_mint,
-            "inAmount": str(request.amount),
-            "outAmount": str(output_amount),
-            "otherAmountThreshold": str(output_amount),
-            "swapMode": "ExactIn",
-            "slippageBps": request.slippage_bps,
-            "priceImpactPct": "0.1",
-            "note": "Estimated quote - prices are approximate"
-        }
-        
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            params = {
+                "inputMint": request.input_mint,
+                "outputMint": request.output_mint,
+                "amount": request.amount,
+                "slippageBps": request.slippage_bps,
+                "onlyDirectRoutes": False,
+                "asLegacyTransaction": False
+            }
+            
+            logging.info(f"Requesting Jupiter quote with params: {params}")
+            
+            response = await client.get(JUPITER_QUOTE_API, params=params)
+            
+            if response.status_code != 200:
+                logging.error(f"Jupiter API error: {response.text}")
+                raise HTTPException(
+                    status_code=response.status_code,
+                    detail=f"Jupiter API error: {response.text}"
+                )
+            
+            quote_data = response.json()
+            logging.info(f"Jupiter quote received: outAmount={quote_data.get('outAmount')}")
+            
+            return quote_data
+            
+    except httpx.TimeoutException:
+        logging.error("Jupiter API request timeout")
+        raise HTTPException(status_code=504, detail="Jupiter API request timeout")
     except HTTPException:
         raise
     except Exception as e:
         logging.error(f"Swap quote error: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Error getting swap quote: {str(e)}")
+
+@api_router.post("/swap/execute")
+async def execute_swap(request: JupiterSwapRequest):
+    """Build swap transaction using Jupiter API"""
+    try:
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            swap_payload = {
+                "quoteResponse": request.quote_response,
+                "userPublicKey": request.user_public_key,
+                "wrapAndUnwrapSol": request.wrap_unwrap_sol,
+                "dynamicComputeUnitLimit": True,
+                "prioritizationFeeLamports": "auto"
+            }
+            
+            if request.compute_unit_price_micro_lamports:
+                swap_payload["computeUnitPriceMicroLamports"] = request.compute_unit_price_micro_lamports
+            
+            logging.info(f"Executing Jupiter swap for user: {request.user_public_key}")
+            
+            response = await client.post(
+                JUPITER_SWAP_API,
+                json=swap_payload
+            )
+            
+            if response.status_code != 200:
+                logging.error(f"Jupiter swap API error: {response.text}")
+                raise HTTPException(
+                    status_code=response.status_code,
+                    detail=f"Jupiter swap API error: {response.text}"
+                )
+            
+            swap_data = response.json()
+            
+            return {
+                "swapTransaction": swap_data.get("swapTransaction"),
+                "lastValidBlockHeight": swap_data.get("lastValidBlockHeight"),
+                "prioritizationFeeLamports": swap_data.get("prioritizationFeeLamports")
+            }
+            
+    except httpx.TimeoutException:
+        logging.error("Jupiter API timeout during swap")
+        raise HTTPException(status_code=504, detail="Jupiter API timeout")
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Swap execution error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error executing swap: {str(e)}")
 
 @api_router.get("/token-balance/{wallet}/{mint}")
 async def get_token_balance(wallet: str, mint: str):
