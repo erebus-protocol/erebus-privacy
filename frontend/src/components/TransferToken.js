@@ -86,6 +86,11 @@ const TransferToken = () => {
   };
 
   const getTokenInfo = async (mintAddress) => {
+    // Check cache first
+    if (tokenMetadataCache[mintAddress]) {
+      return tokenMetadataCache[mintAddress];
+    }
+
     try {
       // Strategy 1: Try backend API first (fastest for known tokens)
       try {
