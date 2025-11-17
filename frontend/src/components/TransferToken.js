@@ -265,12 +265,29 @@ const TransferToken = () => {
                         className="w-full p-3 flex items-center gap-3 hover:bg-[#1a2332] rounded-lg transition-colors"
                         data-testid={`token-option-${token.symbol}`}
                       >
-                        <img src={token.logoURI} alt={token.symbol} className="w-8 h-8 rounded-full" />
+                        {token.logoURI ? (
+                          <img 
+                            src={token.logoURI} 
+                            alt={token.symbol} 
+                            className="w-8 h-8 rounded-full"
+                            onError={(e) => {
+                              e.target.onerror = null;
+                              e.target.src = 'https://via.placeholder.com/32/FFD700/000000?text=' + token.symbol.charAt(0);
+                            }}
+                          />
+                        ) : (
+                          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[var(--gold-primary)] to-[var(--gold-secondary)] flex items-center justify-center text-black font-bold text-sm">
+                            {token.symbol.charAt(0)}
+                          </div>
+                        )}
                         <div className="flex-1 text-left">
                           <div className="flex items-center gap-2">
                             <span className="font-semibold text-white">{token.symbol}</span>
                             {token.tags && token.tags.includes('verified') && (
                               <span className="text-xs bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded">Verified</span>
+                            )}
+                            {token.source === 'cryptoapis' && (
+                              <span className="text-xs bg-purple-500/20 text-purple-400 px-2 py-0.5 rounded">CryptoAPIs</span>
                             )}
                           </div>
                           <div className="text-sm text-gray-400">{token.name}</div>
