@@ -612,57 +612,229 @@ async def get_token_metadata_cryptoapis(mint: str, network: str = "mainnet"):
         logging.error(f"Unexpected error fetching from CryptoAPIs: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Error: {str(e)}")
 
-@api_router.post("/transfer/sol")
-async def transfer_sol_private(request: TransferSOLRequest):
+@api_router.post("/transfer/sol/prepare")
+async def prepare_sol_transfer(request: TransferPrepareRequest):
+    """
+    Step 1: Prepare SOL transfer with privacy protocol
+    Calculate fee and return payment details for user
+    """
     try:
-        amount_lamports = int(request.amount * 1_000_000_000)
-        to_pubkey = Pubkey.from_string(request.to_address)
+        # Validate addresses
+        try:
+            Pubkey.from_string(request.from_address)
+            Pubkey.from_string(request.to_address)
+        except Exception:
+            raise HTTPException(status_code=400, detail="Invalid Solana address")
         
-        transfer_ix = transfer(
-            TransferParams(
-                from_pubkey=TREASURY_KEYPAIR.pubkey(),
-                to_pubkey=to_pubkey,
-                lamports=amount_lamports
-            )
-        )
+        # Validate amount
+        if request.amount <= 0:
+            raise HTTPException(status_code=400, detail="Amount must be greater than 0")
         
-        recent_blockhash_resp = await solana_client.get_latest_blockhash()
-        recent_blockhash = recent_blockhash_resp.value.blockhash
+        # Calculate fee (0.5% with minimum)
+        fee_amount = max(request.amount * PRIVACY_FEE_PERCENTAGE, MIN_PRIVACY_FEE_SOL)
+        total_amount = request.amount + fee_amount
         
-        msg = Message.new_with_blockhash([transfer_ix], TREASURY_KEYPAIR.pubkey(), recent_blockhash)
-        txn = Transaction([TREASURY_KEYPAIR], msg, recent_blockhash)
+        # Get estimated network fee
+        network_fee = 0.000005  # Approximate Solana network fee
         
-        result = await solana_client.send_transaction(
-            txn,
-            opts=TxOpts(skip_preflight=False, preflight_commitment=Confirmed)
-        )
-        
-        tx_signature = str(result.value)
-        
-        tx_record = TransactionRecord(
-            wallet_address=request.from_address,
-            tx_type="transfer_sol",
+        # Create pending transfer record
+        pending_transfer = PendingTransfer(
+            from_address=request.from_address,
+            to_address=request.to_address,
             amount=request.amount,
+            fee_amount=fee_amount,
+            total_amount=total_amount,
             token="SOL",
-            destination=request.to_address,
-            status="completed",
-            tx_signature=tx_signature
+            status="pending"
         )
         
-        doc = tx_record.model_dump()
-        doc['timestamp'] = doc['timestamp'].isoformat()
-        await db.transactions.insert_one(doc)
+        # Save to database
+        doc = pending_transfer.model_dump()
+        doc['created_at'] = doc['created_at'].isoformat()
+        if doc.get('executed_at'):
+            doc['executed_at'] = doc['executed_at'].isoformat()
+        await db.pending_transfers.insert_one(doc)
+        
+        logging.info(f"✅ Prepared SOL transfer: {pending_transfer.id} - {request.amount} SOL + {fee_amount} SOL fee")
         
         return {
-            "success": True,
-            "signature": tx_signature,
-            "message": "SOL transferred successfully",
-            "explorer_url": f"https://solscan.io/tx/{tx_signature}"
+            "transfer_id": pending_transfer.id,
+            "amount": request.amount,
+            "fee_amount": fee_amount,
+            "network_fee": network_fee,
+            "total_to_pay": total_amount,
+            "treasury_address": str(TREASURY_KEYPAIR.pubkey()),
+            "destination_address": request.to_address,
+            "breakdown": {
+                "transfer_amount": request.amount,
+                "privacy_fee": fee_amount,
+                "estimated_network_fee": network_fee,
+                "total": total_amount
+            },
+            "message": f"Please pay {total_amount} SOL to Treasury wallet"
         }
         
+    except HTTPException:
+        raise
     except Exception as e:
-        logging.error(f"Transfer error: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Transfer failed: {str(e)}")
+        logging.error(f"Prepare transfer error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to prepare transfer: {str(e)}")
+
+@api_router.post("/transfer/sol/execute")
+async def execute_sol_transfer(request: TransferExecuteRequest):
+    """
+    Step 2: Execute SOL transfer after user payment verification
+    Verify payment to treasury, then send to destination
+    """
+    try:
+        # Get pending transfer from database
+        pending_doc = await db.pending_transfers.find_one({"id": request.transfer_id})
+        
+        if not pending_doc:
+            raise HTTPException(status_code=404, detail="Transfer not found")
+        
+        # Check if already executed
+        if pending_doc.get('status') == 'executed':
+            raise HTTPException(status_code=400, detail="Transfer already executed")
+        
+        # Verify payment signature on-chain
+        try:
+            payment_sig = request.payment_signature
+            logging.info(f"Verifying payment signature: {payment_sig}")
+            
+            # Get transaction details from blockchain
+            tx_response = await solana_client.get_transaction(
+                payment_sig,
+                encoding="jsonParsed",
+                max_supported_transaction_version=0
+            )
+            
+            if not tx_response or not tx_response.value:
+                raise HTTPException(status_code=400, detail="Payment transaction not found on blockchain")
+            
+            tx_data = tx_response.value
+            
+            # Verify transaction was successful
+            if tx_data.transaction.meta.err:
+                raise HTTPException(status_code=400, detail="Payment transaction failed")
+            
+            # Verify payment details
+            instructions = tx_data.transaction.transaction.message.instructions
+            treasury_pubkey_str = str(TREASURY_KEYPAIR.pubkey())
+            from_address = request.from_address
+            
+            # Find transfer instruction and verify amount & recipient
+            verified = False
+            for ix in instructions:
+                if hasattr(ix, 'parsed') and ix.parsed.get('type') == 'transfer':
+                    info = ix.parsed.get('info', {})
+                    if (info.get('destination') == treasury_pubkey_str and 
+                        info.get('source') == from_address):
+                        paid_lamports = int(info.get('lamports', 0))
+                        paid_sol = paid_lamports / 1_000_000_000
+                        expected_total = pending_doc['total_amount']
+                        
+                        # Allow small variance for rounding
+                        if abs(paid_sol - expected_total) < 0.0001:
+                            verified = True
+                            break
+            
+            if not verified:
+                raise HTTPException(
+                    status_code=400, 
+                    detail="Payment verification failed: amount or recipient mismatch"
+                )
+            
+            logging.info(f"✅ Payment verified: {payment_sig}")
+            
+        except HTTPException:
+            raise
+        except Exception as e:
+            logging.error(f"Payment verification error: {str(e)}")
+            raise HTTPException(status_code=400, detail=f"Payment verification failed: {str(e)}")
+        
+        # Execute transfer from treasury to destination
+        try:
+            amount_lamports = int(pending_doc['amount'] * 1_000_000_000)
+            to_pubkey = Pubkey.from_string(pending_doc['to_address'])
+            
+            transfer_ix = transfer(
+                TransferParams(
+                    from_pubkey=TREASURY_KEYPAIR.pubkey(),
+                    to_pubkey=to_pubkey,
+                    lamports=amount_lamports
+                )
+            )
+            
+            recent_blockhash_resp = await solana_client.get_latest_blockhash()
+            recent_blockhash = recent_blockhash_resp.value.blockhash
+            
+            msg = Message.new_with_blockhash([transfer_ix], TREASURY_KEYPAIR.pubkey(), recent_blockhash)
+            txn = Transaction([TREASURY_KEYPAIR], msg, recent_blockhash)
+            
+            result = await solana_client.send_transaction(
+                txn,
+                opts=TxOpts(skip_preflight=False, preflight_commitment=Confirmed)
+            )
+            
+            destination_signature = str(result.value)
+            
+            logging.info(f"✅ Destination transfer executed: {destination_signature}")
+            
+            # Update pending transfer status
+            await db.pending_transfers.update_one(
+                {"id": request.transfer_id},
+                {
+                    "$set": {
+                        "status": "executed",
+                        "payment_signature": request.payment_signature,
+                        "destination_signature": destination_signature,
+                        "executed_at": datetime.now(timezone.utc).isoformat()
+                    }
+                }
+            )
+            
+            # Save to transactions history
+            tx_record = TransactionRecord(
+                wallet_address=request.from_address,
+                tx_type="private_transfer_sol",
+                amount=pending_doc['amount'],
+                token="SOL",
+                destination=pending_doc['to_address'],
+                status="completed",
+                tx_signature=destination_signature
+            )
+            
+            doc = tx_record.model_dump()
+            doc['timestamp'] = doc['timestamp'].isoformat()
+            await db.transactions.insert_one(doc)
+            
+            return {
+                "success": True,
+                "transfer_id": request.transfer_id,
+                "payment_signature": request.payment_signature,
+                "destination_signature": destination_signature,
+                "amount": pending_doc['amount'],
+                "destination": pending_doc['to_address'],
+                "payment_explorer": f"https://solscan.io/tx/{request.payment_signature}",
+                "destination_explorer": f"https://solscan.io/tx/{destination_signature}",
+                "message": "Private transfer completed successfully"
+            }
+            
+        except Exception as e:
+            # Update status to failed
+            await db.pending_transfers.update_one(
+                {"id": request.transfer_id},
+                {"$set": {"status": "failed"}}
+            )
+            logging.error(f"Destination transfer error: {str(e)}")
+            raise HTTPException(status_code=500, detail=f"Destination transfer failed: {str(e)}")
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Execute transfer error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Transfer execution failed: {str(e)}")
 
 @api_router.post("/transfer/token")
 async def transfer_token_private(request: TransferTokenRequest):
