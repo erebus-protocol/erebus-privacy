@@ -239,7 +239,8 @@ async def get_swap_quote(request: SwapQuoteRequest):
 async def execute_swap(request: JupiterSwapRequest):
     """Build swap transaction using Jupiter API"""
     try:
-        async with httpx.AsyncClient(timeout=30.0) as client:
+        client = await get_jupiter_api_client()
+        async with client:
             swap_payload = {
                 "quoteResponse": request.quote_response,
                 "userPublicKey": request.user_public_key,
