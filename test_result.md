@@ -119,6 +119,18 @@ backend:
       - working: true
         agent: "testing"
         comment: "✅ TESTED SUCCESSFULLY: CryptoAPIs endpoint working correctly. Successfully retrieved BONK token metadata with all required fields (address, symbol, name, decimals, logoURI, source). API key authentication working. Error handling properly implemented - returns appropriate HTTP status codes. Rate limiting encountered (429 errors) due to CryptoAPIs throughput limits (1000 req/sec), which is expected third-party service limitation, not implementation issue. Core functionality verified and working."
+  
+  - task: "Privacy Protocol Endpoints"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implemented 4 new endpoints: /api/transfer/sol/prepare (calculate 0.5% fee, min 0.001 SOL), /api/transfer/sol/execute (verify payment on-chain, execute treasury→destination), /api/transfer/token/prepare (fixed 0.002 SOL fee for tokens), /api/transfer/token/execute (verify & forward token). Added PendingTransfer model to track transfers. Fee constants: PRIVACY_FEE_PERCENTAGE=0.005, MIN_PRIVACY_FEE_SOL=0.001. Includes on-chain payment verification before execution."
 
 frontend:
   - task: "Token metadata utility with fallback mechanism"
