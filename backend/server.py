@@ -127,6 +127,10 @@ def get_or_create_treasury_wallet():
 
 TREASURY_KEYPAIR = get_or_create_treasury_wallet()
 
+# Privacy Protocol Fee Configuration
+PRIVACY_FEE_PERCENTAGE = 0.005  # 0.5% fee
+MIN_PRIVACY_FEE_SOL = 0.001  # Minimum 0.001 SOL fee
+
 # Routes
 @api_router.get("/")
 async def root():
