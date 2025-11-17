@@ -90,27 +90,26 @@ const SwapComponent = () => {
 
     setQuoting(true);
     try {
-      const amount = parseFloat(fromAmount) * Math.pow(10, fromToken.decimals);
-      const response = await axios.post(`${API}/swap/quote`, {
-        input_mint: fromToken.address,
-        output_mint: toToken.address,
-        amount: Math.floor(amount),
-        slippage_bps: 50
-      });
+      const amount = Math.floor(parseFloat(fromAmount) * Math.pow(10, fromToken.decimals));
+      
+      // Call Jupiter API directly from browser (bypasses backend DNS issues)
+      const quoteUrl = `https://quote-api.jup.ag/v6/quote?inputMint=${fromToken.address}&outputMint=${toToken.address}&amount=${amount}&slippageBps=50`;
+      
+      const response = await fetch(quoteUrl);
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch quote from Jupiter');
+      }
+      
+      const quoteData = await response.json();
 
-      if (response.data && response.data.outAmount) {
-        const outAmount = response.data.outAmount / Math.pow(10, toToken.decimals);
+      if (quoteData && quoteData.outAmount) {
+        const outAmount = parseFloat(quoteData.outAmount) / Math.pow(10, toToken.decimals);
         setToAmount(outAmount.toFixed(6));
-        
-        // Show warning if using fallback pricing
-        if (response.data._fallback) {
-          toast.warning('Using estimated pricing - Jupiter API temporarily unavailable', {
-            duration: 3000
-          });
-        }
       }
     } catch (error) {
       console.error('Quote error:', error);
+      toast.error('Failed to get quote. Please try again.');
     } finally {
       setQuoting(false);
     }
