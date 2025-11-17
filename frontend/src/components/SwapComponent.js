@@ -120,11 +120,99 @@ const SwapComponent = () => {
       return;
     }
 
+    if (parseFloat(fromAmount) > fromBalance) {
+      toast.error('Insufficient balance');
+      return;
+    }
+
     setLoading(true);
+    const toastId = toast.loading('Preparing swap...');
+
     try {
-      toast.info('Swap feature coming soon!');
+      // Step 1: Get quote
+      const amount = Math.floor(parseFloat(fromAmount) * Math.pow(10, fromToken.decimals));
+      const quoteResponse = await axios.post(`${API}/swap/quote`, {
+        input_mint: fromToken.address,
+        output_mint: toToken.address,
+        amount: amount,
+        slippage_bps: 50
+      });
+
+      const quote = quoteResponse.data;
+      toast.loading('Building transaction...', { id: toastId });
+
+      // Step 2: Get swap transaction from Jupiter
+      const swapResponse = await axios.post(`${API}/swap/execute`, {
+        quote_response: quote,
+        user_public_key: publicKey.toBase58(),
+        wrap_unwrap_sol: true
+      });
+
+      const { swapTransaction } = swapResponse.data;
+      
+      if (!swapTransaction) {
+        throw new Error('Failed to build swap transaction');
+      }
+
+      toast.loading('Please sign the transaction...', { id: toastId });
+
+      // Step 3: Deserialize and sign transaction
+      const { VersionedTransaction } = await import('@solana/web3.js');
+      const swapTransactionBuf = Buffer.from(swapTransaction, 'base64');
+      const transaction = VersionedTransaction.deserialize(swapTransactionBuf);
+
+      // Sign transaction using wallet adapter
+      const { signTransaction } = await import('@solana/wallet-adapter-react');
+      const wallet = window.solana;
+      
+      if (!wallet || !wallet.signTransaction) {
+        throw new Error('Wallet not found or does not support signing');
+      }
+
+      const signedTransaction = await wallet.signTransaction(transaction);
+      
+      toast.loading('Broadcasting transaction...', { id: toastId });
+
+      // Step 4: Send transaction
+      const rawTransaction = signedTransaction.serialize();
+      const txid = await connection.sendRawTransaction(rawTransaction, {
+        skipPreflight: true,
+        maxRetries: 2
+      });
+
+      toast.loading('Confirming transaction...', { id: toastId });
+
+      // Step 5: Wait for confirmation
+      const confirmation = await connection.confirmTransaction(txid, 'confirmed');
+
+      if (confirmation.value.err) {
+        throw new Error('Transaction failed');
+      }
+
+      toast.success(
+        <div>
+          Swap successful! 
+          <a 
+            href={`https://solscan.io/tx/${txid}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[var(--gold-primary)] hover:underline ml-2"
+          >
+            View on Solscan
+          </a>
+        </div>,
+        { id: toastId, duration: 5000 }
+      );
+
+      // Refresh balances
+      setFromAmount('');
+      setToAmount('');
+      await fetchBalances();
+
     } catch (error) {
-      toast.error('Swap failed: ' + error.message);
+      console.error('Swap error:', error);
+      const errorMessage = error.response?.data?.detail || error.message || 'Swap failed';
+      toast.error(errorMessage, { id: toastId });
     } finally {
       setLoading(false);
     }
