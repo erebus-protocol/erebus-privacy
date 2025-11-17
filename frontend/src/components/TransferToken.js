@@ -149,33 +149,19 @@ const TransferToken = () => {
         console.log(`Token registry error: ${registryError.message}`);
       }
 
-      // Strategy 4: Try on-chain metadata (for newer tokens with metadata)
-      try {
-        const { Metadata } = await import('@metaplex-foundation/mpl-token-metadata');
-        const metadataPDA = await Metadata.getPDA(new PublicKey(mintAddress));
-        const metadata = await Metadata.load(connection, metadataPDA);
-        
-        if (metadata && metadata.data) {
-          return {
-            symbol: metadata.data.symbol,
-            name: metadata.data.name,
-            logo: metadata.data.uri || null
-          };
-        }
-      } catch (metaplexError) {
-        console.log(`On-chain metadata not available: ${metaplexError.message}`);
-      }
 
     } catch (error) {
       console.error(`Error fetching token info for ${mintAddress}:`, error);
     }
     
     // Fallback: Use shortened address as symbol
-    return {
+    const fallbackData = {
       symbol: mintAddress.substring(0, 4) + '...' + mintAddress.substring(mintAddress.length - 4),
       name: 'Unknown Token',
       logo: null
     };
+    tokenMetadataCache[mintAddress] = fallbackData;
+    return fallbackData;
   };
 
   const handleTransfer = async () => {
