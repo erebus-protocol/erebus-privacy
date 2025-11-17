@@ -448,7 +448,14 @@ class ErebusBackendTester:
             self.test_balance_endpoint,
             self.test_invalid_balance_endpoint,
             self.test_treasury_wallet_validation,
-            self.test_cors_headers
+            self.test_cors_headers,
+            self.test_token_list_endpoint,
+            self.test_token_info_endpoint,
+            self.test_cryptoapis_endpoint_bonk,
+            self.test_cryptoapis_endpoint_sol,
+            self.test_cryptoapis_invalid_mint,
+            self.test_cryptoapis_nonexistent_token,
+            self.test_cryptoapis_devnet_network
         ]
         
         for test_func in test_functions:
