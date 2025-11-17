@@ -260,9 +260,16 @@ async def get_swap_quote(request: SwapQuoteRequest):
 @api_router.post("/swap/execute")
 async def execute_swap(request: JupiterSwapRequest):
     """Build swap transaction using Jupiter API"""
+    
+    # Check if quote was from fallback (DNS issue)
+    if request.quote_response.get("_fallback"):
+        raise HTTPException(
+            status_code=503,
+            detail="Swap execution unavailable due to DNS issues. Jupiter API cannot be reached from this server. Please contact support or try again later."
+        )
+    
     try:
-        client = await get_jupiter_api_client()
-        async with client:
+        async with httpx.AsyncClient(timeout=30.0) as client:
             swap_payload = {
                 "quoteResponse": request.quote_response,
                 "userPublicKey": request.user_public_key,
@@ -296,6 +303,12 @@ async def execute_swap(request: JupiterSwapRequest):
                 "prioritizationFeeLamports": swap_data.get("prioritizationFeeLamports")
             }
             
+    except (httpx.ConnectError, httpx.NetworkError, OSError) as e:
+        logging.error(f"Network error executing swap: {str(e)}")
+        raise HTTPException(
+            status_code=503,
+            detail="Jupiter API unavailable due to network/DNS issues. Please try again later."
+        )
     except httpx.TimeoutException:
         logging.error("Jupiter API timeout during swap")
         raise HTTPException(status_code=504, detail="Jupiter API timeout")
