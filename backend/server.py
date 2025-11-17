@@ -503,6 +503,77 @@ async def get_token_info(mint: str):
         logging.error(f"Token info error: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Error fetching token info: {str(e)}")
 
+@api_router.get("/token-metadata/cryptoapis/{mint}")
+async def get_token_metadata_cryptoapis(mint: str, network: str = "mainnet"):
+    """
+    Get token metadata from CryptoAPIs.io (fallback for Jupiter Token List)
+    This endpoint acts as a secure proxy to keep the API key on the server
+    """
+    try:
+        api_key = os.environ.get('CRYPTOAPIS_API_KEY')
+        if not api_key:
+            logging.error("CRYPTOAPIS_API_KEY not configured")
+            raise HTTPException(status_code=503, detail="CryptoAPIs service not configured")
+        
+        # CryptoAPIs endpoint
+        cryptoapis_url = f"https://rest.cryptoapis.io/contracts/solana/{network}/{mint}/token-details"
+        
+        headers = {
+            "x-api-key": api_key,
+            "Content-Type": "application/json"
+        }
+        
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            logging.info(f"Fetching token metadata from CryptoAPIs for mint: {mint}")
+            response = await client.get(cryptoapis_url, headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Extract relevant information from CryptoAPIs response
+                item = data.get('data', {}).get('item', {})
+                fungible_values = item.get('fungibleValues', {})
+                
+                # Transform to our standard format
+                token_metadata = {
+                    "address": mint,
+                    "symbol": item.get('symbol', 'UNKNOWN'),
+                    "name": item.get('name', 'Unknown Token'),
+                    "decimals": fungible_values.get('decimals', 9),
+                    "logoURI": item.get('image'),
+                    "description": item.get('description'),
+                    "totalSupply": fungible_values.get('totalSupply'),
+                    "type": item.get('type', 'fungible'),
+                    "collection": item.get('collection'),
+                    "tags": ["cryptoapis"],
+                    "source": "cryptoapis"
+                }
+                
+                logging.info(f"✅ CryptoAPIs metadata received for {mint}: {token_metadata.get('symbol')}")
+                return token_metadata
+                
+            elif response.status_code == 404:
+                logging.warning(f"Token {mint} not found on CryptoAPIs")
+                raise HTTPException(status_code=404, detail="Token not found on CryptoAPIs")
+            elif response.status_code == 402:
+                logging.error("CryptoAPIs: Insufficient credits")
+                raise HTTPException(status_code=402, detail="CryptoAPIs: Insufficient credits")
+            else:
+                logging.error(f"CryptoAPIs returned status {response.status_code}: {response.text}")
+                raise HTTPException(
+                    status_code=response.status_code,
+                    detail=f"CryptoAPIs error: {response.text}"
+                )
+                
+    except HTTPException:
+        raise
+    except (httpx.ConnectError, httpx.NetworkError, httpx.TimeoutException) as e:
+        logging.error(f"Network error connecting to CryptoAPIs: {str(e)}")
+        raise HTTPException(status_code=503, detail=f"CryptoAPIs service unavailable: {str(e)}")
+    except Exception as e:
+        logging.error(f"Unexpected error fetching from CryptoAPIs: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error: {str(e)}")
+
 @api_router.post("/transfer/sol")
 async def transfer_sol_private(request: TransferSOLRequest):
     try:
