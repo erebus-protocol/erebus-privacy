@@ -148,6 +148,11 @@ const SwapComponent = () => {
       const quote = quoteResponse.data;
       toast.loading('Building transaction...', { id: toastId });
 
+      // Check if quote used fallback pricing
+      if (quote._fallback) {
+        throw new Error('Jupiter API is temporarily unavailable. Real swaps cannot be executed with estimated pricing. Please try again later.');
+      }
+
       // Step 2: Get swap transaction from Jupiter
       const swapResponse = await axios.post(`${API}/swap/execute`, {
         quote_response: quote,
