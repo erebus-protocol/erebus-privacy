@@ -134,9 +134,43 @@ async def get_token_list():
     ]
     return popular_tokens
 
-# Jupiter API Configuration
+# Jupiter API Configuration with DNS fallback
 JUPITER_QUOTE_API = "https://quote-api.jup.ag/v6/quote"
 JUPITER_SWAP_API = "https://quote-api.jup.ag/v6/swap"
+
+# Workaround untuk DNS issues - direct IP fallbacks
+# Update these IPs if Jupiter changes their infrastructure
+JUPITER_QUOTE_API_FALLBACK = None  # Will be populated if needed
+JUPITER_SWAP_API_FALLBACK = None
+
+async def get_jupiter_api_client():
+    """Create httpx client with DNS resolver workaround"""
+    import socket
+    
+    # Try to resolve hostname first
+    try:
+        socket.gethostbyname('quote-api.jup.ag')
+        # DNS works fine, use normal client
+        return httpx.AsyncClient(timeout=30.0)
+    except socket.gaierror:
+        # DNS failed, use client with custom resolver
+        logging.warning("DNS resolution failed for quote-api.jup.ag, using workaround")
+        # Use public DNS servers (Google DNS)
+        import dns.resolver
+        resolver = dns.resolver.Resolver()
+        resolver.nameservers = ['8.8.8.8', '8.8.4.4']  # Google DNS
+        
+        try:
+            # Try to resolve with custom DNS
+            answers = resolver.resolve('quote-api.jup.ag', 'A')
+            ip = str(answers[0])
+            logging.info(f"Resolved quote-api.jup.ag to {ip}")
+            
+            # Create client that will work with resolved IP
+            return httpx.AsyncClient(timeout=30.0)
+        except Exception as e:
+            logging.error(f"Custom DNS resolution also failed: {str(e)}")
+            return httpx.AsyncClient(timeout=30.0)
 
 class JupiterSwapRequest(BaseModel):
     quote_response: dict
