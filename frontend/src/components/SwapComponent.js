@@ -101,6 +101,13 @@ const SwapComponent = () => {
       if (response.data && response.data.outAmount) {
         const outAmount = response.data.outAmount / Math.pow(10, toToken.decimals);
         setToAmount(outAmount.toFixed(6));
+        
+        // Show warning if using fallback pricing
+        if (response.data._fallback) {
+          toast.warning('Using estimated pricing - Jupiter API temporarily unavailable', {
+            duration: 3000
+          });
+        }
       }
     } catch (error) {
       console.error('Quote error:', error);
