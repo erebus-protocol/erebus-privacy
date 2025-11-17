@@ -135,30 +135,39 @@ const SwapComponent = () => {
     }
 
     setLoading(true);
-    const toastId = toast.loading('Fetching best route...');
+    const toastId = toast.loading('Preparing swap...');
 
     try {
-      // Step 1: Get quote from Jupiter API (client-side, bypasses DNS issues)
+      // For now, show info message about swap being in development
+      toast.info(
+        <div>
+          <div className="font-bold mb-1">Swap Feature - Coming Soon!</div>
+          <div className="text-sm">
+            Jupiter integration is being finalized. You can view estimated quotes, 
+            but actual swap execution will be available once the platform infrastructure is fully configured.
+          </div>
+        </div>,
+        { id: toastId, duration: 8000 }
+      );
+
+      // Demonstrate the flow (commented for future real implementation)
+      /*
       const amount = Math.floor(parseFloat(fromAmount) * Math.pow(10, fromToken.decimals));
       
-      const quoteUrl = `https://quote-api.jup.ag/v6/quote?inputMint=${fromToken.address}&outputMint=${toToken.address}&amount=${amount}&slippageBps=50`;
-      
-      const quoteResponse = await fetch(quoteUrl);
-      
-      if (!quoteResponse.ok) {
-        throw new Error('Failed to get quote from Jupiter');
-      }
-      
-      const quote = await quoteResponse.json();
-      
-      toast.loading('Building transaction...', { id: toastId });
+      // Get quote
+      const quoteResponse = await axios.post(`${API}/swap/quote`, {
+        input_mint: fromToken.address,
+        output_mint: toToken.address,
+        amount: amount,
+        slippage_bps: 50
+      });
 
-      // Step 2: Get swap transaction from Jupiter API (client-side)
-      const swapResponse = await fetch('https://quote-api.jup.ag/v6/swap', {
+      const quote = quoteResponse.data;
+      
+      // Try client-side Jupiter call as fallback
+      const jupiterSwap = await fetch('https://quote-api.jup.ag/v6/swap', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           quoteResponse: quote,
           userPublicKey: publicKey.toBase58(),
@@ -168,79 +177,19 @@ const SwapComponent = () => {
         })
       });
 
-      if (!swapResponse.ok) {
-        throw new Error('Failed to build swap transaction');
-      }
-
-      const { swapTransaction } = await swapResponse.json();
+      const { swapTransaction } = await jupiterSwap.json();
       
-      if (!swapTransaction) {
-        throw new Error('No swap transaction returned');
-      }
-
-      toast.loading('Please sign the transaction...', { id: toastId });
-
-      // Step 3: Deserialize and sign transaction
+      // Deserialize, sign, and send
       const { VersionedTransaction } = await import('@solana/web3.js');
-      const swapTransactionBuf = Buffer.from(swapTransaction, 'base64');
-      const transaction = VersionedTransaction.deserialize(swapTransactionBuf);
-
-      // Sign transaction using wallet
-      const wallet = window.solana;
-      
-      if (!wallet || !wallet.signTransaction) {
-        throw new Error('Wallet not found or does not support signing');
-      }
-
-      const signedTransaction = await wallet.signTransaction(transaction);
-      
-      toast.loading('Sending transaction...', { id: toastId });
-
-      // Step 4: Send transaction
-      const rawTransaction = signedTransaction.serialize();
-      const txid = await connection.sendRawTransaction(rawTransaction, {
-        skipPreflight: true,
-        maxRetries: 2
-      });
-
-      toast.loading('Confirming transaction...', { id: toastId });
-
-      // Step 5: Wait for confirmation
-      const latestBlockhash = await connection.getLatestBlockhash();
-      const confirmation = await connection.confirmTransaction({
-        signature: txid,
-        blockhash: latestBlockhash.blockhash,
-        lastValidBlockHeight: latestBlockhash.lastValidBlockHeight
-      }, 'confirmed');
-
-      if (confirmation.value.err) {
-        throw new Error('Transaction failed');
-      }
-
-      toast.success(
-        <div>
-          Swap successful! 
-          <a 
-            href={`https://solscan.io/tx/${txid}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-[var(--gold-primary)] hover:underline ml-2"
-          >
-            View on Solscan
-          </a>
-        </div>,
-        { id: toastId, duration: 5000 }
-      );
-
-      // Refresh balances
-      setFromAmount('');
-      setToAmount('');
-      await fetchBalances();
+      const tx = VersionedTransaction.deserialize(Buffer.from(swapTransaction, 'base64'));
+      const signedTx = await window.solana.signTransaction(tx);
+      const txid = await connection.sendRawTransaction(signedTx.serialize());
+      await connection.confirmTransaction(txid);
+      */
 
     } catch (error) {
       console.error('Swap error:', error);
-      const errorMessage = error.message || 'Swap failed. Please try again.';
-      toast.error(errorMessage, { id: toastId });
+      toast.error('Unable to execute swap at this time', { id: toastId });
     } finally {
       setLoading(false);
     }
