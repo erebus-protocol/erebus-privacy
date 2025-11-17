@@ -32,20 +32,77 @@ const TransferToken = () => {
   }, [publicKey]);
 
   const fetchWalletTokens = async () => {
+    if (!publicKey || !connection) return;
+    
     try {
       setLoadingTokens(true);
-      const response = await axios.get(`${API}/wallet-tokens/${publicKey.toBase58()}`);
-      setWalletTokens(response.data.tokens || []);
       
-      if (response.data.tokens.length > 0) {
-        setSelectedToken(response.data.tokens[0]);
+      // Fetch all SPL token accounts for this wallet
+      const tokenAccounts = await connection.getParsedTokenAccountsByOwner(
+        publicKey,
+        { programId: new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA') }
+      );
+
+      // Parse and format token data
+      const tokens = [];
+      
+      for (const account of tokenAccounts.value) {
+        const parsedInfo = account.account.data.parsed.info;
+        const mintAddress = parsedInfo.mint;
+        const tokenAmount = parsedInfo.tokenAmount;
+        
+        // Only include tokens with balance > 0
+        if (parseFloat(tokenAmount.uiAmount) > 0) {
+          // Try to get token metadata
+          const tokenInfo = await getTokenInfo(mintAddress);
+          
+          tokens.push({
+            address: mintAddress,
+            symbol: tokenInfo.symbol || 'Unknown',
+            name: tokenInfo.name || 'Unknown Token',
+            decimals: tokenAmount.decimals,
+            balance: parseFloat(tokenAmount.uiAmount),
+            logo: tokenInfo.logo || null
+          });
+        }
+      }
+
+      setWalletTokens(tokens);
+      
+      if (tokens.length > 0) {
+        setSelectedToken(tokens[0]);
+      } else {
+        toast.info('No tokens found in wallet');
       }
     } catch (error) {
       console.error('Error fetching wallet tokens:', error);
-      toast.error('Failed to load tokens');
+      toast.error('Failed to load tokens from wallet');
     } finally {
       setLoadingTokens(false);
     }
+  };
+
+  const getTokenInfo = async (mintAddress) => {
+    try {
+      // Try to get from backend token list
+      const response = await axios.get(`${API}/token/info/${mintAddress}`);
+      if (response.data) {
+        return {
+          symbol: response.data.symbol,
+          name: response.data.name,
+          logo: response.data.logoURI
+        };
+      }
+    } catch (error) {
+      // If not found in backend, return defaults
+      console.log(`Token info not found for ${mintAddress}`);
+    }
+    
+    return {
+      symbol: mintAddress.substring(0, 4) + '...',
+      name: 'Unknown Token',
+      logo: null
+    };
   };
 
   const handleTransfer = async () => {
