@@ -62,14 +62,17 @@ const SwapComponent = () => {
   }, [fromAmount, fromToken, toToken]);
 
   const fetchBalances = async () => {
+    if (!publicKey || !connection) return;
+    
     try {
       // Fetch FROM token balance
       if (fromToken.symbol === 'SOL') {
         const bal = await connection.getBalance(publicKey);
         setFromBalance(bal / LAMPORTS_PER_SOL);
       } else {
-        const response = await axios.get(`${API}/token-balance/${publicKey.toBase58()}/${fromToken.address}`);
-        setFromBalance(response.data.balance || 0);
+        // Fetch SPL token balance using getTokenAccountsByOwner
+        const tokenBalance = await getTokenBalance(fromToken.address, fromToken.decimals);
+        setFromBalance(tokenBalance);
       }
       
       // Fetch TO token balance
@@ -77,11 +80,48 @@ const SwapComponent = () => {
         const bal = await connection.getBalance(publicKey);
         setToBalance(bal / LAMPORTS_PER_SOL);
       } else {
-        const response = await axios.get(`${API}/token-balance/${publicKey.toBase58()}/${toToken.address}`);
-        setToBalance(response.data.balance || 0);
+        // Fetch SPL token balance using getTokenAccountsByOwner
+        const tokenBalance = await getTokenBalance(toToken.address, toToken.decimals);
+        setToBalance(tokenBalance);
       }
     } catch (error) {
       console.error('Balance fetch error:', error);
+    }
+  };
+
+  const getTokenBalance = async (mintAddress, decimals) => {
+    try {
+      const { PublicKey } = await import('@solana/web3.js');
+      const { TOKEN_PROGRAM_ID } = await import('@solana/spl-token');
+      
+      const mintPublicKey = new PublicKey(mintAddress);
+      
+      // Get all token accounts for this wallet
+      const tokenAccounts = await connection.getTokenAccountsByOwner(
+        publicKey,
+        { mint: mintPublicKey }
+      );
+
+      if (tokenAccounts.value.length === 0) {
+        return 0; // No token account found
+      }
+
+      // Parse account data to get balance
+      const accountInfo = tokenAccounts.value[0];
+      const accountData = accountInfo.account.data;
+      
+      // Token account data layout: amount is at bytes 64-72 (u64 little-endian)
+      const amountBuffer = accountData.slice(64, 72);
+      const amount = Buffer.from(amountBuffer).readBigUInt64LE(0);
+      
+      // Convert to UI amount using decimals
+      const balance = Number(amount) / Math.pow(10, decimals);
+      
+      return balance;
+      
+    } catch (error) {
+      console.error(`Error fetching balance for ${mintAddress}:`, error);
+      return 0;
     }
   };
 
