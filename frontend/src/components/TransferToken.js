@@ -14,6 +14,9 @@ import { ScrollArea } from './ui/scroll-area';
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
+// Token metadata cache to avoid repeated API calls
+const tokenMetadataCache = {};
+
 const TransferToken = () => {
   const { publicKey, sendTransaction } = useWallet();
   const { connection } = useConnection();
