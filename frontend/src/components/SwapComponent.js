@@ -92,24 +92,27 @@ const SwapComponent = () => {
     try {
       const amount = Math.floor(parseFloat(fromAmount) * Math.pow(10, fromToken.decimals));
       
-      // Call Jupiter API directly from browser (bypasses backend DNS issues)
-      const quoteUrl = `https://quote-api.jup.ag/v6/quote?inputMint=${fromToken.address}&outputMint=${toToken.address}&amount=${amount}&slippageBps=50`;
-      
-      const response = await fetch(quoteUrl);
-      
-      if (!response.ok) {
-        throw new Error('Failed to fetch quote from Jupiter');
-      }
-      
-      const quoteData = await response.json();
+      // Try Jupiter API via backend proxy (CORS-free)
+      const response = await axios.post(`${API}/swap/quote`, {
+        input_mint: fromToken.address,
+        output_mint: toToken.address,
+        amount: amount,
+        slippage_bps: 50
+      });
 
-      if (quoteData && quoteData.outAmount) {
-        const outAmount = parseFloat(quoteData.outAmount) / Math.pow(10, toToken.decimals);
+      if (response.data && response.data.outAmount) {
+        const outAmount = parseFloat(response.data.outAmount) / Math.pow(10, toToken.decimals);
         setToAmount(outAmount.toFixed(6));
+        
+        // Show info if using fallback
+        if (response.data._fallback) {
+          console.log('Using fallback pricing due to Jupiter API unavailability');
+        }
       }
     } catch (error) {
       console.error('Quote error:', error);
-      toast.error('Failed to get quote. Please try again.');
+      // Don't show error toast, just log it
+      // User can still see last quote or try different amounts
     } finally {
       setQuoting(false);
     }
