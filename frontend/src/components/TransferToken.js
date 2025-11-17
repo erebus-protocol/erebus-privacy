@@ -96,11 +96,13 @@ const TransferToken = () => {
       try {
         const response = await axios.get(`${API}/token/info/${mintAddress}`, { timeout: 3000 });
         if (response.data && response.data.symbol) {
-          return {
+          const tokenData = {
             symbol: response.data.symbol,
             name: response.data.name || response.data.symbol,
             logo: response.data.logoURI || null
           };
+          tokenMetadataCache[mintAddress] = tokenData;
+          return tokenData;
         }
       } catch (backendError) {
         console.log(`Backend token info not found for ${mintAddress}, trying external APIs`);
