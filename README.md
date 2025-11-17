@@ -1,15 +1,15 @@
 # 🔒 Erebus Protocol
 
-> Zero-Knowledge Privacy Layer for Solana Blockchain
+> Zero-Knowledge Privacy SDK for Solana Blockchain
 
 [![Solana](https://img.shields.io/badge/Solana-Blockchain-9945FF?style=for-the-badge&logo=solana)](https://solana.com)
-[![React](https://img.shields.io/badge/React-18.x-61DAFB?style=for-the-badge&logo=react)](https://reactjs.org)
-[![FastAPI](https://img.shields.io/badge/FastAPI-Latest-009688?style=for-the-badge&logo=fastapi)](https://fastapi.tiangolo.com)
-[![MongoDB](https://img.shields.io/badge/MongoDB-Latest-47A248?style=for-the-badge&logo=mongodb)](https://www.mongodb.com)
+[![JavaScript](https://img.shields.io/badge/JavaScript-SDK-F7DF1E?style=for-the-badge&logo=javascript)](./sdk/javascript)
+[![Python](https://img.shields.io/badge/Python-SDK-3776AB?style=for-the-badge&logo=python)](./sdk/python)
+[![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](./LICENSE)
 
 ## 📖 Overview
 
-**Erebus Protocol** is a privacy-focused application for the Solana blockchain that enables users to perform SOL and SPL token transfers with enhanced privacy through a treasury wallet mechanism. Using zero-knowledge privacy concepts, this protocol breaks the on-chain link between sender and receiver.
+**Erebus Protocol** provides official SDKs for integrating zero-knowledge privacy features into your Solana applications. Break on-chain links between sender and receiver with our simple-to-use developer tools.
 
 ### 🎯 Key Features
 
@@ -18,12 +18,68 @@
 - **💱 Token Swap Integration** - Jupiter Aggregator for best swap rates
 - **📊 Token Metadata** - Multi-source metadata with fallback (Jupiter → CryptoAPIs → On-chain)
 - **💰 Real-time Balances** - Live balance tracking for SOL and tokens
-- **🎨 Modern UI/UX** - Dark theme with gold accents, Lottie animations
-- **📱 Wallet Integration** - Support for Phantom, Solflare, and other wallets
+- **📱 Easy Integration** - Simple SDK for JavaScript/TypeScript and Python
 
 ---
 
-## 🏗️ Architecture
+## 🚀 Quick Start
+
+### JavaScript/TypeScript
+
+**Installation:**
+```bash
+npm install erebus-sdk
+# or
+yarn add erebus-sdk
+```
+
+**Usage:**
+```javascript
+const { ErebusClient } = require('erebus-sdk');
+
+const client = new ErebusClient({
+  apiUrl: 'https://api.erebusprotocol.io'
+});
+
+// Prepare private SOL transfer
+const transfer = await client.transfer.prepareSol({
+  fromAddress: 'your_wallet_address',
+  toAddress: 'destination_wallet_address',
+  amount: 0.5
+});
+
+console.log('Total to pay:', transfer.totalToPay, 'SOL');
+console.log('Privacy fee:', transfer.feeAmount, 'SOL');
+```
+
+### Python
+
+**Installation:**
+```bash
+pip install erebus-sdk
+```
+
+**Usage:**
+```python
+from erebus import ErebusClient, TransferPrepareRequest
+
+async with ErebusClient(api_url='https://api.erebusprotocol.io') as client:
+    # Prepare private SOL transfer
+    transfer = await client.prepare_sol_transfer(
+        TransferPrepareRequest(
+            from_address='your_wallet_address',
+            to_address='destination_wallet_address',
+            amount=0.5
+        )
+    )
+    
+    print(f'Total to pay: {transfer.total_to_pay} SOL')
+    print(f'Privacy fee: {transfer.fee_amount} SOL')
+```
+
+---
+
+## 🏗️ How It Works
 
 ### Privacy Protocol Flow
 
@@ -42,159 +98,33 @@
 3. Treasury automatically forwards **Amount** to destination wallet
 4. User receives 2 transaction signatures (payment & destination)
 
-### Tech Stack
-
-**Frontend:**
-- React 18 + TailwindCSS
-- Solana Wallet Adapter
-- @solana/web3.js + @solana/spl-token
-- Lottie animations
-- Axios for API calls
-
-**Backend:**
-- FastAPI (Python)
-- Motor (Async MongoDB driver)
-- Solana Python SDK
-- HTTPX for external APIs
-
-**Blockchain:**
-- Solana Mainnet/Devnet
-- Jupiter Aggregator API
-- CryptoAPIs.io for token metadata
-
-**Database:**
-- MongoDB for transaction history & pending transfers
+**Privacy Benefit:**
+- On-chain observer only sees: User → Treasury, Treasury → Destination
+- Direct link between user and destination is broken
 
 ---
 
-## 🚀 Quick Start
+## 📚 Documentation
 
-### Prerequisites
+### For Developers
 
-- Node.js 16+ & Yarn
-- Python 3.9+
-- MongoDB
-- Solana wallet (Phantom recommended)
+- **[Developer Guide](./DEVELOPER.md)** - Complete integration guide with code examples
+- **[SDK Documentation](./sdk/README.md)** - Comprehensive API reference
+- **[JavaScript Examples](./sdk/examples/javascript-example.js)** - Full code examples
+- **[Python Examples](./sdk/examples/python-example.py)** - Full code examples
 
-### Installation
+### SDK Features
 
-1. **Clone Repository**
-   ```bash
-   git clone https://github.com/erebus-protocol/erebus-privacy.git
-   cd erebus-privacy
-   ```
-
-2. **Setup Backend**
-   ```bash
-   cd backend
-   pip install -r requirements.txt
-   
-   # Create .env file
-   cat > .env << EOF
-   MONGO_URL="mongodb://localhost:27017"
-   DB_NAME="erebus_protocol"
-   CORS_ORIGINS="*"
-   TREASURY_PRIVATE_KEY="your_treasury_private_key_base58"
-   CRYPTOAPIS_API_KEY="your_cryptoapis_key"
-   EOF
-   
-   # Run backend
-   uvicorn server:app --host 0.0.0.0 --port 8001 --reload
-   ```
-
-3. **Setup Frontend**
-   ```bash
-   cd frontend
-   yarn install
-   
-   # Create .env file
-   cat > .env << EOF
-   REACT_APP_BACKEND_URL="http://localhost:8001"
-   EOF
-   
-   # Run frontend
-   yarn start
-   ```
-
-4. **Access Application**
-   - Frontend: http://localhost:3000
-   - Backend API: http://localhost:8001/docs
-
----
-
-## 📚 API Documentation
-
-### Privacy Transfer Endpoints
-
-#### 1. Prepare SOL Transfer
-```http
-POST /api/transfer/sol/prepare
-Content-Type: application/json
-
-{
-  "from_address": "user_wallet_address",
-  "to_address": "destination_wallet_address",
-  "amount": 0.5
-}
-```
-
-**Response:**
-```json
-{
-  "transfer_id": "uuid",
-  "amount": 0.5,
-  "fee_amount": 0.0025,
-  "total_to_pay": 0.5025,
-  "treasury_address": "treasury_wallet_address",
-  "breakdown": {
-    "transfer_amount": 0.5,
-    "privacy_fee": 0.0025,
-    "estimated_network_fee": 0.000005,
-    "total": 0.5025
-  }
-}
-```
-
-#### 2. Execute SOL Transfer
-```http
-POST /api/transfer/sol/execute
-Content-Type: application/json
-
-{
-  "transfer_id": "uuid_from_prepare",
-  "payment_signature": "transaction_signature",
-  "from_address": "user_wallet_address"
-}
-```
-
-**Response:**
-```json
-{
-  "success": true,
-  "payment_signature": "sig1...",
-  "destination_signature": "sig2...",
-  "amount": 0.5,
-  "destination": "destination_address"
-}
-```
-
-### Token Metadata Endpoints
-
-#### Get Token Metadata (Multi-source)
-```http
-GET /api/token-metadata/cryptoapis/{mint_address}?network=mainnet
-```
-
-### Other Endpoints
-
-- `GET /api/token-list` - Popular tokens list
-- `GET /api/token-info/{mint}` - Token info by mint
-- `GET /api/balance/{address}` - Get SOL balance
-- `GET /api/wallet-tokens/{address}` - Get all tokens in wallet
-- `POST /api/swap/quote` - Get swap quote from Jupiter
-- `GET /api/transactions/{address}` - Transaction history
-
-Full API documentation available at: http://localhost:8001/docs
+| Feature | JavaScript | Python |
+|---------|-----------|--------|
+| Private SOL Transfer | ✅ | ✅ |
+| Private Token Transfer | ✅ | ✅ |
+| Token Metadata | ✅ | ✅ |
+| Balance Queries | ✅ | ✅ |
+| Swap Quotes | ✅ | ✅ |
+| Transaction History | ✅ | ✅ |
+| TypeScript Support | ✅ | ✅ (Type hints) |
+| Async/Await | ✅ | ✅ |
 
 ---
 
@@ -209,81 +139,149 @@ Full API documentation available at: http://localhost:8001/docs
 
 ---
 
-## 🔧 Configuration
+## 🔧 API Endpoints
 
-### Environment Variables
+### Base URLs
 
-**Backend (.env):**
-```bash
-MONGO_URL="mongodb://localhost:27017"
-DB_NAME="erebus_protocol"
-CORS_ORIGINS="*"
-TREASURY_PRIVATE_KEY="base58_encoded_private_key"
-CRYPTOAPIS_API_KEY="your_api_key"
-```
+- **Production:** `https://api.erebusprotocol.io/api`
+- **Devnet:** `https://devnet-api.erebusprotocol.io/api`
 
-**Frontend (.env):**
-```bash
-REACT_APP_BACKEND_URL="http://localhost:8001"
-```
+### Available Endpoints
 
-### Generating Treasury Wallet
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/transfer/sol/prepare` | POST | Prepare SOL transfer |
+| `/transfer/sol/execute` | POST | Execute SOL transfer |
+| `/transfer/token/prepare` | POST | Prepare token transfer |
+| `/transfer/token/execute` | POST | Execute token transfer |
+| `/token-list` | GET | Get popular tokens |
+| `/token-info/{mint}` | GET | Get token info |
+| `/token-metadata/cryptoapis/{mint}` | GET | Get token metadata |
+| `/wallet-tokens/{address}` | GET | Get wallet tokens |
+| `/balance/{address}` | GET | Get SOL balance |
+| `/swap/quote` | POST | Get swap quote |
+| `/transactions/{address}` | GET | Get transaction history |
+| `/treasury/address` | GET | Get treasury address |
 
-Run the backend once, and it will auto-generate a treasury wallet. Copy the private key to `.env`:
-
-```bash
-python -c "from solders.keypair import Keypair; import base58; kp = Keypair(); print(f'Public: {kp.pubkey()}\nPrivate: {base58.b58encode(bytes(kp)).decode()}')"
-```
-
----
-
-## 🎨 Features Deep Dive
-
-### 1. Private SOL Transfer
-
-**UI Flow:**
-- **Step 1:** User inputs amount and destination address
-- **Step 2:** Review fee breakdown and pay to treasury
-- **Step 3:** View both transaction signatures
-
-**Privacy Benefit:**
-- On-chain observer only sees: User → Treasury, Treasury → Destination
-- Direct link between user and destination is broken
-
-### 2. Token Metadata System
-
-3-tier fallback mechanism:
-1. **Jupiter Token List** (Primary) - Comprehensive, fast, cached
-2. **CryptoAPIs.io** (Fallback) - For tokens not in Jupiter
-3. **On-chain** (Final) - Basic info parsed from blockchain
-
-### 3. Token Swap
-
-Integrated with Jupiter Aggregator:
-- Best price aggregation
-- Multiple DEX routing
-- Slippage protection
-- Client-side execution for reliability
+Full API documentation: [https://api.erebusprotocol.io/docs](https://api.erebusprotocol.io/docs)
 
 ---
 
-## 🛡️ Security Considerations
+## 💡 Example: Complete Private Transfer
 
-### Best Practices Implemented
+### JavaScript
+
+```javascript
+import { ErebusClient } from 'erebus-sdk';
+import { useWallet, useConnection } from '@solana/wallet-adapter-react';
+import { Transaction, SystemProgram, PublicKey } from '@solana/web3.js';
+
+const client = new ErebusClient({ apiUrl: 'https://api.erebusprotocol.io' });
+
+async function privateTransfer(toAddress, amount) {
+  const { publicKey, sendTransaction } = useWallet();
+  const { connection } = useConnection();
+
+  // Step 1: Prepare transfer
+  const prepare = await client.transfer.prepareSol({
+    fromAddress: publicKey.toBase58(),
+    toAddress: toAddress,
+    amount: amount
+  });
+
+  // Step 2: Pay to treasury
+  const transaction = new Transaction().add(
+    SystemProgram.transfer({
+      fromPubkey: publicKey,
+      toPubkey: new PublicKey(prepare.treasuryAddress),
+      lamports: Math.floor(prepare.totalToPay * 1e9)
+    })
+  );
+
+  const signature = await sendTransaction(transaction, connection);
+  await connection.confirmTransaction(signature);
+
+  // Step 3: Execute transfer
+  const result = await client.transfer.executeSol({
+    transferId: prepare.transferId,
+    paymentSignature: signature,
+    fromAddress: publicKey.toBase58()
+  });
+
+  console.log('Transfer complete!');
+  console.log('Destination TX:', result.destinationExplorer);
+}
+```
+
+### Python
+
+```python
+from erebus import ErebusClient, TransferPrepareRequest, TransferExecuteRequest
+from solana.rpc.async_api import AsyncClient
+from solders.keypair import Keypair
+
+async def private_transfer(wallet: Keypair, to_address: str, amount: float):
+    async with ErebusClient(api_url='https://api.erebusprotocol.io') as client:
+        # Step 1: Prepare transfer
+        prepare = await client.prepare_sol_transfer(
+            TransferPrepareRequest(
+                from_address=str(wallet.pubkey()),
+                to_address=to_address,
+                amount=amount
+            )
+        )
+
+        # Step 2: Pay to treasury (using Solana SDK)
+        payment_signature = await send_to_treasury(wallet, prepare)
+
+        # Step 3: Execute transfer
+        result = await client.execute_sol_transfer(
+            TransferExecuteRequest(
+                transfer_id=prepare.transfer_id,
+                payment_signature=payment_signature,
+                from_address=str(wallet.pubkey())
+            )
+        )
+
+        print('Transfer complete!')
+        print(f'Destination TX: {result.destination_explorer}')
+```
+
+See full examples in [Developer Guide](./DEVELOPER.md)
+
+---
+
+## 🛡️ Security
+
+### Best Practices
 
 ✅ Private keys stored in environment variables  
 ✅ API keys proxied through backend  
 ✅ On-chain payment verification before execution  
 ✅ Transaction status tracking in database  
-✅ Input validation on both frontend and backend  
-✅ Error handling with proper HTTP status codes  
+✅ Input validation on both client and server  
+✅ Proper error handling with HTTP status codes  
 
 ### Important Notes
 
-⚠️ **Not Production Ready**: This is a proof-of-concept  
-⚠️ **Treasury Security**: Secure your treasury private key  
-⚠️ **Audit Required**: Code not audited for production use  
-⚠️ **Network**: Test on devnet first before mainnet  
+⚠️ **Test on Devnet First** - Always test on devnet before using mainnet  
+⚠️ **Secure Your Keys** - Never expose private keys in code  
+⚠️ **Rate Limiting** - Implement rate limiting in production  
+⚠️ **Audit Required** - Code not audited for production use  
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Please follow these steps:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for detailed guidelines.
 
 ---
 
@@ -304,8 +302,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📧 Contact & Support
 
-- **GitHub Issues**: For bugs and feature requests
-- **Discussions**: For questions and community support
+- **GitHub Issues**: [Report bugs or request features](https://github.com/erebus-protocol/erebus-privacy/issues)
+- **Discussions**: [Ask questions](https://github.com/erebus-protocol/erebus-privacy/discussions)
+- **Documentation**: [Developer Guide](./DEVELOPER.md) | [SDK Docs](./sdk/README.md)
 
 ---
 
