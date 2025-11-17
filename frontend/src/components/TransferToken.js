@@ -84,22 +84,81 @@ const TransferToken = () => {
 
   const getTokenInfo = async (mintAddress) => {
     try {
-      // Try to get from backend token list
-      const response = await axios.get(`${API}/token/info/${mintAddress}`);
-      if (response.data) {
-        return {
-          symbol: response.data.symbol,
-          name: response.data.name,
-          logo: response.data.logoURI
-        };
+      // Strategy 1: Try backend API first (fastest for known tokens)
+      try {
+        const response = await axios.get(`${API}/token/info/${mintAddress}`, { timeout: 3000 });
+        if (response.data && response.data.symbol) {
+          return {
+            symbol: response.data.symbol,
+            name: response.data.name || response.data.symbol,
+            logo: response.data.logoURI || null
+          };
+        }
+      } catch (backendError) {
+        console.log(`Backend token info not found for ${mintAddress}, trying external APIs`);
       }
+
+      // Strategy 2: Try Jupiter Token List API (comprehensive)
+      try {
+        const jupiterResponse = await fetch('https://token.jup.ag/all');
+        const jupiterTokens = await jupiterResponse.json();
+        
+        const tokenInfo = jupiterTokens.find(t => t.address === mintAddress);
+        if (tokenInfo) {
+          return {
+            symbol: tokenInfo.symbol,
+            name: tokenInfo.name,
+            logo: tokenInfo.logoURI || null
+          };
+        }
+      } catch (jupiterError) {
+        console.log(`Jupiter API error: ${jupiterError.message}`);
+      }
+
+      // Strategy 3: Try Solana Token Registry (official list)
+      try {
+        const registryResponse = await fetch(
+          'https://raw.githubusercontent.com/solana-labs/token-list/main/src/tokens/solana.tokenlist.json',
+          { cache: 'force-cache' }
+        );
+        const registryData = await registryResponse.json();
+        
+        const tokenInfo = registryData.tokens.find(t => t.address === mintAddress);
+        if (tokenInfo) {
+          return {
+            symbol: tokenInfo.symbol,
+            name: tokenInfo.name,
+            logo: tokenInfo.logoURI || null
+          };
+        }
+      } catch (registryError) {
+        console.log(`Token registry error: ${registryError.message}`);
+      }
+
+      // Strategy 4: Try on-chain metadata (for newer tokens with metadata)
+      try {
+        const { Metadata } = await import('@metaplex-foundation/mpl-token-metadata');
+        const metadataPDA = await Metadata.getPDA(new PublicKey(mintAddress));
+        const metadata = await Metadata.load(connection, metadataPDA);
+        
+        if (metadata && metadata.data) {
+          return {
+            symbol: metadata.data.symbol,
+            name: metadata.data.name,
+            logo: metadata.data.uri || null
+          };
+        }
+      } catch (metaplexError) {
+        console.log(`On-chain metadata not available: ${metaplexError.message}`);
+      }
+
     } catch (error) {
-      // If not found in backend, return defaults
-      console.log(`Token info not found for ${mintAddress}`);
+      console.error(`Error fetching token info for ${mintAddress}:`, error);
     }
     
+    // Fallback: Use shortened address as symbol
     return {
-      symbol: mintAddress.substring(0, 4) + '...',
+      symbol: mintAddress.substring(0, 4) + '...' + mintAddress.substring(mintAddress.length - 4),
       name: 'Unknown Token',
       logo: null
     };
