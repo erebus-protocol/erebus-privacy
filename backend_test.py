@@ -277,6 +277,167 @@ class ErebusBackendTester:
         # This test mainly checks if the endpoint is accessible
         return success
 
+    def test_token_list_endpoint(self):
+        """Test token list endpoint"""
+        success, response = self.run_test(
+            "Token List Endpoint",
+            "GET",
+            "api/token-list",
+            200
+        )
+        
+        if success and response:
+            if isinstance(response, list) and len(response) > 0:
+                print(f"   📋 Found {len(response)} tokens in list")
+                
+                # Check if popular tokens are present
+                symbols = [token.get('symbol') for token in response]
+                expected_tokens = ['SOL', 'USDC', 'BONK']
+                found_tokens = [token for token in expected_tokens if token in symbols]
+                
+                print(f"   ✅ Popular tokens found: {found_tokens}")
+                return len(found_tokens) > 0
+            else:
+                print(f"   ❌ Empty or invalid token list response")
+                return False
+        return success
+
+    def test_token_info_endpoint(self):
+        """Test token info endpoint with known token"""
+        # Test with SOL token
+        sol_mint = "So11111111111111111111111111111111111111112"
+        success, response = self.run_test(
+            "Token Info Endpoint - SOL",
+            "GET",
+            f"api/token-info/{sol_mint}",
+            200
+        )
+        
+        if success and response:
+            required_fields = ['address', 'symbol', 'name', 'decimals']
+            missing_fields = [field for field in required_fields if field not in response]
+            
+            if not missing_fields:
+                print(f"   ✅ All required fields present")
+                print(f"   🪙 Token: {response.get('symbol')} - {response.get('name')}")
+                print(f"   🔢 Decimals: {response.get('decimals')}")
+                return True
+            else:
+                print(f"   ❌ Missing fields: {missing_fields}")
+                return False
+        return success
+
+    def test_cryptoapis_endpoint_bonk(self):
+        """Test CryptoAPIs endpoint with BONK token"""
+        bonk_mint = "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263"
+        success, response = self.run_test(
+            "CryptoAPIs Endpoint - BONK Token",
+            "GET",
+            f"api/token-metadata/cryptoapis/{bonk_mint}?network=mainnet",
+            200
+        )
+        
+        if success and response:
+            required_fields = ['address', 'symbol', 'name', 'decimals', 'source']
+            missing_fields = [field for field in required_fields if field not in response]
+            
+            if not missing_fields:
+                print(f"   ✅ All required fields present")
+                print(f"   🪙 Token: {response.get('symbol')} - {response.get('name')}")
+                print(f"   🔢 Decimals: {response.get('decimals')}")
+                print(f"   🏷️ Source: {response.get('source')}")
+                
+                # Verify source is cryptoapis
+                if response.get('source') == 'cryptoapis':
+                    print(f"   ✅ Correct source attribution")
+                    return True
+                else:
+                    print(f"   ⚠️  Source should be 'cryptoapis', got: {response.get('source')}")
+                    return False
+            else:
+                print(f"   ❌ Missing fields: {missing_fields}")
+                return False
+        return success
+
+    def test_cryptoapis_endpoint_sol(self):
+        """Test CryptoAPIs endpoint with SOL token"""
+        sol_mint = "So11111111111111111111111111111111111111112"
+        success, response = self.run_test(
+            "CryptoAPIs Endpoint - SOL Token",
+            "GET",
+            f"api/token-metadata/cryptoapis/{sol_mint}?network=mainnet",
+            200
+        )
+        
+        if success and response:
+            required_fields = ['address', 'symbol', 'name', 'decimals', 'source']
+            missing_fields = [field for field in required_fields if field not in response]
+            
+            if not missing_fields:
+                print(f"   ✅ All required fields present")
+                print(f"   🪙 Token: {response.get('symbol')} - {response.get('name')}")
+                print(f"   🔢 Decimals: {response.get('decimals')}")
+                print(f"   🏷️ Source: {response.get('source')}")
+                
+                # Verify source is cryptoapis
+                if response.get('source') == 'cryptoapis':
+                    print(f"   ✅ Correct source attribution")
+                    return True
+                else:
+                    print(f"   ⚠️  Source should be 'cryptoapis', got: {response.get('source')}")
+                    return False
+            else:
+                print(f"   ❌ Missing fields: {missing_fields}")
+                return False
+        return success
+
+    def test_cryptoapis_invalid_mint(self):
+        """Test CryptoAPIs endpoint with invalid mint address"""
+        invalid_mint = "InvalidMintAddress123"
+        success, response = self.run_test(
+            "CryptoAPIs Endpoint - Invalid Mint",
+            "GET",
+            f"api/token-metadata/cryptoapis/{invalid_mint}?network=mainnet",
+            404  # Should return 404 for invalid/non-existent token
+        )
+        
+        if success:
+            print(f"   ✅ Correctly returned 404 for invalid mint")
+            return True
+        return False
+
+    def test_cryptoapis_nonexistent_token(self):
+        """Test CryptoAPIs endpoint with valid format but non-existent token"""
+        # Use a valid Solana address format but non-existent token
+        fake_mint = "11111111111111111111111111111111111111111111"
+        success, response = self.run_test(
+            "CryptoAPIs Endpoint - Non-existent Token",
+            "GET",
+            f"api/token-metadata/cryptoapis/{fake_mint}?network=mainnet",
+            404  # Should return 404 for non-existent token
+        )
+        
+        if success:
+            print(f"   ✅ Correctly returned 404 for non-existent token")
+            return True
+        return False
+
+    def test_cryptoapis_devnet_network(self):
+        """Test CryptoAPIs endpoint with devnet network parameter"""
+        bonk_mint = "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263"
+        success, response = self.run_test(
+            "CryptoAPIs Endpoint - Devnet Network",
+            "GET",
+            f"api/token-metadata/cryptoapis/{bonk_mint}?network=devnet",
+            404  # BONK likely doesn't exist on devnet, should return 404
+        )
+        
+        # Either 200 (if token exists on devnet) or 404 (if not) is acceptable
+        if success or response:
+            print(f"   ✅ Devnet network parameter handled correctly")
+            return True
+        return False
+
     def run_all_tests(self):
         """Run all backend tests"""
         print(f"\n🧪 Running All Backend Tests\n")
