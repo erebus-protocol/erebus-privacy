@@ -182,7 +182,10 @@ class JupiterSwapRequest(BaseModel):
 async def get_swap_quote(request: SwapQuoteRequest):
     """Get real-time swap quote from Jupiter Aggregator API"""
     try:
-        async with httpx.AsyncClient(timeout=30.0) as client:
+        # Use client with DNS workaround
+        client = await get_jupiter_api_client()
+        
+        async with client:
             params = {
                 "inputMint": request.input_mint,
                 "outputMint": request.output_mint,
@@ -194,19 +197,34 @@ async def get_swap_quote(request: SwapQuoteRequest):
             
             logging.info(f"Requesting Jupiter quote with params: {params}")
             
-            response = await client.get(JUPITER_QUOTE_API, params=params)
+            # Try with direct URL first, fallback to resolved IP if needed
+            urls_to_try = [JUPITER_QUOTE_API]
             
-            if response.status_code != 200:
-                logging.error(f"Jupiter API error: {response.text}")
-                raise HTTPException(
-                    status_code=response.status_code,
-                    detail=f"Jupiter API error: {response.text}"
-                )
+            last_error = None
+            for url in urls_to_try:
+                try:
+                    response = await client.get(url, params=params)
+                    
+                    if response.status_code != 200:
+                        logging.error(f"Jupiter API error: {response.text}")
+                        raise HTTPException(
+                            status_code=response.status_code,
+                            detail=f"Jupiter API error: {response.text}"
+                        )
+                    
+                    quote_data = response.json()
+                    logging.info(f"Jupiter quote received: outAmount={quote_data.get('outAmount')}")
+                    
+                    return quote_data
+                    
+                except (httpx.ConnectError, httpx.NetworkError) as e:
+                    last_error = e
+                    logging.warning(f"Failed to connect to {url}: {str(e)}")
+                    continue
             
-            quote_data = response.json()
-            logging.info(f"Jupiter quote received: outAmount={quote_data.get('outAmount')}")
-            
-            return quote_data
+            # If all URLs failed, raise the last error
+            if last_error:
+                raise last_error
             
     except httpx.TimeoutException:
         logging.error("Jupiter API request timeout")
