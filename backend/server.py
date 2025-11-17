@@ -249,12 +249,17 @@ async def get_swap_quote(request: SwapQuoteRequest):
                 logging.warning(f"Jupiter API returned status {response.status_code}")
                 raise httpx.HTTPStatusError(f"Status {response.status_code}", request=None, response=response)
             
-    except (httpx.ConnectError, httpx.NetworkError, httpx.TimeoutException, OSError) as e:
+    except (httpx.ConnectError, httpx.NetworkError, httpx.TimeoutException) as e:
         # DNS or network error - use fallback
-        logging.warning(f"Jupiter API unavailable ({type(e).__name__}), using fallback quote calculation")
+        logging.warning(f"Jupiter API unavailable ({type(e).__name__}: {str(e)}), using fallback quote calculation")
+        return await get_fallback_quote(request)
+    except OSError as e:
+        # OSError includes DNS errors ([Errno -5] No address associated with hostname)
+        logging.warning(f"Network/DNS error: {str(e)}, using fallback quote calculation")
         return await get_fallback_quote(request)
     except Exception as e:
-        logging.error(f"Unexpected error accessing Jupiter API: {str(e)}, using fallback")
+        # Catch-all for any other errors
+        logging.warning(f"Unexpected error accessing Jupiter API: {str(e)}, using fallback")
         return await get_fallback_quote(request)
 
 @api_router.post("/swap/execute")
